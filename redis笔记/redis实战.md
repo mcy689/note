@@ -77,6 +77,32 @@
    > 构建最近联系人自动补全列表通常需要对Redis执行3个操作
    >
    > 1. 添加或者更新一个联系人, 让他成为最新的被联系用户, 这个操作包含下面3个步骤
+   >
    >    * 如果指定的联系人已经存在于最近联系人列表里面, 那么从列表里面移除他
+   >
    >    * 将指定的联系人添加到最近联系人列表的最前面
-   >    * 如果在添加操作完成之后, 最近联系人列表包含的联系人数量超过了100个, 那么对列表进行修剪,只保留位于列表前面的100联系人. 
+   >
+   >    * 如果在添加操作完成之后, 最近联系人列表包含的联系人数量超过了100个, 那么对列表进行修剪,只保留位于列表前面的100联系人
+   >
+   >      ```php
+   >      /**
+   >       * 执行添加用户操作
+   >       * @param redis  $redis   [description]
+   >       * @param [type] $user    [description]
+   >       * @param [type] $contact [description]
+   >       */
+   >      function add_user_contact(redis $redis, $user, $contact) {
+   >      	$ac_list = 'recent:' . $user;
+   >      	$redis->multi();
+   >      	$redis->lrem($ac_list, $contact);
+   >      	$redis->lpush($ac_list, $contact);
+   >      	$redis->ltrim($ac_list, 0, 100);
+   >      	$result = $redis->exec();
+   >      	return $result;
+   >      }
+   >      $redis = new Redis();
+   >      $redis->connect('localhost', 6379);
+   >      add_user_contact($redis, 'tom', 'time');
+   >      ```
+   >
+   >      ​
