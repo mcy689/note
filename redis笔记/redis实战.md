@@ -72,4 +72,6 @@
     -d <size>          Data size of SET/GET value in bytes (default 2)
    ```
 
-6. ​
+6. 自动补全最近联系人实现思路
+
+   ​
