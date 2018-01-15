@@ -105,4 +105,72 @@
    >      add_user_contact($redis, 'tom', 'time');
    >      ```
    >
-   >      ​
+   > 2. 在用户不想看见某个联系人的时候, 将指定的联系人从联系人列表里面移除掉
+   >
+   >    ```php
+   >    /**
+   >     * 删除指定的联系人
+   >     * @param  redis  $redis   [description]
+   >     * @param  [type] $user    [description]
+   >     * @param  [type] $contact [description]
+   >     * @return [type]          [description]
+   >     */
+   >    function remove_contact(redis $redis, $user, $contact) {
+   >    	$redis->lrem('recent:' . $user, $contact);
+   >    }
+   >    ```
+   >
+   > 3. 获取自动补全列表并查找匹配的用户. 因为实际的自动补全都是在php中完成的, 所以操作需要首先获取整个列表结构, 然后再在php里面处理它
+   >
+   >    ​
+
+7. 锁的重要性
+
+   ```php
+   /**
+    * 将商品放到市场上面进行销售   看思路这里有些代码是错误的
+    * @return [type] [description]
+    */
+   function list_item(redis $redis, $itemid, $sellerid, $price) {
+   	$redis->watch('testsort');
+   	if (!$redis->sismember('testsort', $itemid)) {
+   		$redis->unwatch();
+   		return false;
+   	}
+
+   	$redis->multi();
+   	$redis->sadd('market:A.4', $price);
+   	$redis->srem('testsort', $itemid);
+   	$redis->exec();
+   	return true;
+   }
+   /** 
+    * 销售商品      看思路这里有些代码是错误的
+    * @param  redis  $redis    [description]
+    * @param  [type] $buyerid  [description]
+    * @param  [type] $itemid   [description]
+    * @param  [type] $sellerid [description]
+    * @param  [type] $lprice   [description]
+    * @return [type]           [description]
+    */
+   function purchase_item(redis $redis, $buyerid, $itemid, $sellerid, $lprice) {
+
+   	$redis->watch('market:' . $buyer);
+   	$price = $redis->zscore('market:A.4');
+   	$funds = $redis->hget('buyer', 'funds');
+   	if ($price != $lprice || $price > $funds) {
+   		$redis->unwatch();
+   		return false;
+   	}
+
+   	$redis->multi();
+   	$redis->hincrby('seller2', 'funds', $price);
+   	$redis->hincrby($buyerid, 'funds', -$price);
+   	$redis->sadd('market:A.4', $itemid);
+   	$redis->zrem('market:A.4');
+   	$redis->exec();
+   	return true;
+   }
+   ```
+
+   ​
