@@ -196,6 +196,43 @@
      --]]
      ```
 
-7. 索引
+7. 循环
+
+   * 控制结构的条件表达式结果可以是任何值, Lua认为false和nil为假, true和非nil为真
+
+     ```lua
+     if(0)
+     then
+     	print('0为true') --输出这个
+     else
+     	print('false真是false');
+     end
+     ```
+
+8. 函数
+
+   ```lua
+   --示例一
+     function max(num1,num2)
+         if(num1 > num2) then
+             result = num1;
+         else 
+             result = num2;
+         end
+         return result
+     end
+     print('两者比较最大值为',max(2,3))
+   --示例二
+   	local myprint = function(param) --这是个疑问,将这里的变量变成一个局部变量但是在函数里还是能调用
+   	print('这是打印函数 ##',param,'##')
+       end
+       function add(num1,num2)
+           result = num1 + num2
+           myprint(result)
+       end
+       add(2,3)
+   ```
+
+   ​
 
    ​
