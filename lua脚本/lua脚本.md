@@ -93,35 +93,109 @@
        print(a3["none"]) --nil
      ```
 
-5. function
+   * function
 
-   ```lua
-   --第一个示例 函数可以存在变量里:
-       function factorial1(n)
-           if n == 0 then
-               return 1
-           else 
-               return n* factorial1(n-1) --调用自己
-           end
-       end
-       print(factorial1(5))
-       factorial2 = factorial1
-       print(factorial2(5))
+     ```lua
+     --第一个示例 函数可以存在变量里:
+         function factorial1(n)
+             if n == 0 then
+                 return 1
+             else 
+                 return n* factorial1(n-1) --调用自己
+             end
+         end
+         print(factorial1(5))
+         factorial2 = factorial1
+         print(factorial2(5))
 
-   --可以以匿名函数（anonymous function）的方式通过参数传递:
-       function testFun(tab,fun)
-           for k,v in pairs(tab) do
-               print(fun(k,v))
-           end
-       end
-       tab = {key1='val1',key2='val2'}
-       testFun(tab,
-           function(key,val)  --匿名函数
-               return key..'='..val
-           end
-       )
-   ```
+     --可以以匿名函数（anonymous function）的方式通过参数传递:
+         function testFun(tab,fun)
+             for k,v in pairs(tab) do
+                 print(fun(k,v))
+             end
+         end
+         tab = {key1='val1',key2='val2'}
+         testFun(tab,
+             function(key,val)  --匿名函数
+                 return key..'='..val
+             end
+         )
+     ```
 
-6. 线程跟协程的区别：线程可以同时多个运行，而协程任意时刻只能运行一个，并且处于运行状态的协程只有被挂起（suspend）时才会暂停。
+   * 线程跟协程的区别：线程可以同时多个运行，而协程任意时刻只能运行一个，并且处于运行状态的协程只有被挂起（suspend）时才会暂停。
 
-7. userdata 是一种用户自定义数据，用于表示一种由应用程序或 C/C++ 语言库所创建的类型，可以将任意 C/C++ 的任意数据类型的数据（通常是 struct 和 指针）存储到 Lua 变量中调用。
+   * userdata 是一种用户自定义数据，用于表示一种由应用程序或 C/C++ 语言库所创建的类型，可以将任意 C/C++ 的任意数据类型的数据（通常是 struct 和 指针）存储到 Lua 变量中调用。
+
+5. Lua变量
+
+   * 变量在使用前, 必须在代码中进行声明, 即创建该变量. 编译程序执行代码之前编译器需要知道如何给语句变量开辟存储区, 用于存储变量的值.
+
+   * Lua 变量有三种类型: 全局变量、局部变量、表中的域
+
+     * lua中的变量全是全局变量， 那怕是语句块或是函数里， 除非用`local` 显式声明为局部变量
+     * 局部变量的作用域为从声明位置开始到所在语句块结束
+
+   * 变量的默认值为nil
+
+     ```lua
+     function joke()
+     	c = 5 --全局变量
+     	local d = 6 -- 局部变量
+     end
+     joke()
+     print(c,d) -- 5 nil
+
+     do
+     	local a=6 --局部变量
+     	b = 6 --全局变量
+     	print(a,b) -- 6 6
+     end
+     print(a,b) --nil 6
+     ```
+
+6. 赋值语句
+
+   * Lua可以对多个变量同时赋值, 变量列表和值列表的各个元素用逗号分开, 赋值语句右边的值会依次赋给左边的变量.
+
+     ```lua
+     x = 6
+     a, b =  10, 2*x 
+     print(a,b)
+     ```
+
+   * 遇到赋值语句Lua会先计算右边所有的值然后再执行赋值操作, 所以我们可以这样进行交换变量的值
+
+     ```lua
+     tab = {key1='val1',key2='val2'}
+     tab.key1, tab.key2 = tab.key2, tab.key1
+     print(type(tab))   -- table
+     for k,v in pairs(tab) do
+     	print(k..' = '..v);  --key1 = val2 key2 = val1
+     end
+     ```
+
+   * 当变量个数和值的个数不一致时, lua会一直以变量个数为基础采取以下策略
+
+     ```lua
+     --a. 变量个数 > 值的个数      按变量个数不足nil
+     --b. 变量个数 < 值的个数      多余的值会被忽略
+     a,b,c = 1,2
+     print(a,b,c) --1  2  nil
+
+     a,b = a+1,b+1,b+2
+     print(a,b)  --2  3
+     ```
+
+   * 多值赋值经常用来交换变量, 或将函数调用返回给变量
+
+     ```lua
+     --下面的这种用法类似于php中的  list($a,$b) = fun()
+     a, b = f()
+     --[[  
+     	f() 返回两个值, 第一个赋给a, 第二个赋给b
+     --]]
+     ```
+
+7. 索引
+
+   ​
