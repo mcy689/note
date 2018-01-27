@@ -211,28 +211,66 @@
 
 8. 函数
 
-   ```lua
-   --示例一
-     function max(num1,num2)
-         if(num1 > num2) then
-             result = num1;
-         else 
-             result = num2;
-         end
-         return result
-     end
-     print('两者比较最大值为',max(2,3))
-   --示例二
-   	local myprint = function(param) --这是个疑问,将这里的变量变成一个局部变量但是在函数里还是能调用
-   	print('这是打印函数 ##',param,'##')
-       end
-       function add(num1,num2)
-           result = num1 + num2
-           myprint(result)
-       end
-       add(2,3)
-   ```
+   * 函数的声明
 
-   ​
+     ```lua
+     --示例一
+       function max(num1,num2)
+           if(num1 > num2) then
+               result = num1;
+           else 
+               result = num2;
+           end
+           return result
+       end
+       print('两者比较最大值为',max(2,3))
+     --示例二
+     	local myprint = function(param) --这是个疑问,将这里的变量变成一个局部变量但是在函数里还是能调用
+     	print('这是打印函数 ##',param,'##')
+         end
+         function add(num1,num2)
+             result = num1 + num2
+             myprint(result)
+         end
+         add(2,3)
+     ```
+
+   * Lua函数可以返回多个结果值 , 在return后列出要返回的值得列表即可返回多值
+
+     ```lua
+     --这个函数返回 表中最大值和最大值的索引
+     function maximum(a)
+     	local mi = 1
+     	local m = a[mi]
+     	for i,val in pairs(a) do
+     		if val > m then
+     			mi = i
+     			m = val
+     		end
+     	end
+     	return m,mi
+     end
+     print(maximum({8,10,23,12,5}));
+     ```
+
+   * lua函数可以接受可变数目的参数, 函数参数列表中使用三点( ... )表示函数有可变的参数 , lua将函数的参数放在一个叫`arg的表` 中, `#arg` 表示传入参数的个数
+
+     ```lua
+     function average(...)
+     	result = 0
+     	local args={...}
+     	for i,v in ipairs(args) do
+     		result = result + v
+     	end
+     	print('总共传入'..#args..'个数');
+     	return result /#args
+     end
+     print(average(10,23,19,30));
+
+     总共传入4个数
+     20.5
+     ```
+
+9. 运算符
 
    ​
