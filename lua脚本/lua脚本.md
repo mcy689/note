@@ -271,6 +271,52 @@
      20.5
      ```
 
-9. 运算符
+9. lua迭代器
 
-   ​
+   1. 泛型for迭代器
+
+      泛型for在自己内部保存迭代函数, 实际上它保存三个值; 迭代函数, 状态常量, 控制变量 .
+
+      ```lua
+      for k,v in pairs(t) do
+        print(k,v)
+       end
+
+      k,v 为变量列表, pair(t)为表达列表
+      ```
+
+   2. 无状态的迭代器
+
+      迭代函数都是用两个变量 ( 状态常量和控制变量 ) 的值作为参数被调用
+
+      ```lua
+      function square(iteratorMaxCount,currentNumber)
+      	if currentNumber < iteratorMaxCount
+      	then
+      		currentNumber = currentNumber + 1
+      	return currentNumber * currentNumber ,currentNumber
+      	end
+      end
+
+      for i,n in square,3,0 do
+      	print(i,n)
+      end
+      ```
+
+      迭代的状态包括被遍历的表( 循环过程中不会改变状态常量 ) 和当前的索引下标 ( 控制变量 ) 
+
+      ```lua
+      function iter(a,i)
+      	i = i + 1
+      	local v = a[i]
+      	if v then 
+      		return i,v
+      	end
+      end
+      test = {'top','down'}
+      for k,n in iter,test,0 do
+      	print(k,n)
+      end
+      ```
+
+      ​
