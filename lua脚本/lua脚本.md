@@ -317,6 +317,8 @@
       for k,n in iter,test,0 do
       	print(k,n)
       end
+
+      当lua函数调用 
       ```
 
       ​
