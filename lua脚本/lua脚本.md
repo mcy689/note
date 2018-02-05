@@ -322,3 +322,37 @@
       ```
 
       ​
+
+10. lua中的模块
+
+   1. Lua的模块是由变量, 函数等已知元素组成的table
+
+      ```lua
+      --module.lua 文件
+          module = {}
+          --这是声明常量
+          module.constant = '这是一个常量'
+          --这是一个公有函数
+          function module.func1()
+              io.write('这是一个公有函数!\n')
+          end
+          --私有函数
+          local function func2()
+              print('这是一个私有函数!')
+          end
+          --调用私有函数
+          function module.func3()
+              func2()
+          end
+      	return module
+      --引用文件modul.lua
+          b = require('./module')
+          print(b.constant)
+          b.func3()
+
+      ```
+
+11. Lua元表
+
+    * Lua提供元表( Metatable ), 可以对两个table进行操作
+    * ​
