@@ -355,4 +355,46 @@
 11. Lua元表
 
     * Lua提供元表( Metatable ), 可以对两个table进行操作
-    * ​
+
+    * __元方法__ 当Lua试图对两个表进行相加时, 先检查两者之一是否有元素, 之后检查是否有一个叫`__add` 的字段, 若找到, 则调用对应的值. `__add` 等即时字段, 其对应的值就是__元方法__
+
+      ```lua
+      示例
+      mytable = setmetatable({key1 = value1},{
+          __index = function(mytable,key)
+            if( key == 'key2') then
+              return 'metatablevalue'
+             else
+              return nil
+              end
+            end
+        })
+      print(mytabl.key1,mytabl.key2)
+
+      如果 __index包含一个函数的话, Lua就会调用那个函数, table和键名会作为参数传递给函数
+      ```
+
+    * Lua查找一个表元素时的规则
+
+      1. 在表中查找, 如果找到, 返回该元素, 找不到则继续
+      2. 判断该表是否元表, 如果没有元表, 返回nil, 有元表则继续
+      3. 判断元素有没有` __index`方法, 如果`__index` 方法为nil, 则返回nil, 如果`__index `  方法是一个表, 则重复, 如果`__index` 方法是个函数, 则返回该函数的返回值
+
+    * `__newindex` 元方法
+
+      `__newindex`  元方法用来对表更新, `__index` 则用来对表访问
+
+      当你给表的一个缺少的索引赋值, 解释器就会查找 `__newindex`  元方法; 如果存在则调用这个函数而不进行赋值
+
+      ```lua
+      mymetatable = {}
+      mytable = setmetatable({key1 = 'value1'},{__newindex = mymetatable})
+      ```
+
+12. 协同程序
+
+    * 线程与协同程序的主要区别在于, 一个具有多个线程的程序可以同时运行几个线程, 而协同程序却需要彼此协作的运行
+
+    * 在任一指定时刻只有一个协同程序在运行, 并且这个正在运行的协同程序只有在明确的被要求挂起的时候才会被挂起
+
+      ​
