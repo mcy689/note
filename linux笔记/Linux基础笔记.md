@@ -100,6 +100,48 @@
    >
    >​		如果你在目录下不具有x的权限, 那么你就无法切换到该目录下, 也就无法执行该目录下的任何指令
 
-   ​
 
-   ​
+------
+
+#### 文件与目录管理
+
+1. `pwd` 命令
+
+   ```html
+   pwd  显示目前所在的目录    print working directory
+   	-P 显示出确实的路径, 而非使用连结(link)路径
+   ```
+
+2. mkdir ( 建立新目录 )
+
+   ```html
+   mkdir 建立新目录          make directory
+   	-m 设定档案的权限
+   	-p 帮助你直接将所需要的目录递归建立起来
+   	mkdir -m 711 test 创建 drwx--x--x 权限的文件
+   ```
+
+3. 关于执行文件路径
+
+   * 当我们在执行一个指令的时候, 系统会依照PATH的设定去每个PATH定义的目录下搜寻文件名为ls的可执行文件, 如果PATH定义的目录中包含有多个文件名为ls的可执行档, 那么先搜寻到同名指令先被执行
+
+   * PATH这个目录是由一堆目录所组成的, 每个目录中间用冒号隔开, 这个目录是有顺序之分的
+
+     ```html
+     root 执行
+     /usr/local/apache2/bin:/usr/local/mysql/bin:/usr/local/php/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+
+     machunyu
+     /usr/local/apache2/bin:/usr/local/mysql/bin:/usr/local/php/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/machunyu/.local/bin:/home/machunyu/bin
+     ```
+
+
+   * PATH的增删改
+
+     ```html
+     echo $PATH  查看哪些目录被定义出来
+     PATH="$PATH":/root  这个操作可以将 /root 加入到PATH当中 （关闭终端失效）   
+     ```
+
+   * ​
+
