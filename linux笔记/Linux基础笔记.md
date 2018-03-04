@@ -135,13 +135,40 @@
      /usr/local/apache2/bin:/usr/local/mysql/bin:/usr/local/php/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/machunyu/.local/bin:/home/machunyu/bin
      ```
 
-
    * PATH的增删改
 
      ```html
      echo $PATH  查看哪些目录被定义出来
-     PATH="$PATH":/root  这个操作可以将 /root 加入到PATH当中 （关闭终端失效）   
+     PATH="$PATH":/root  这个操作可以将 /root 加入到PATH当中 （关闭终端失效）
+     添加环境变量
+         export PATH=/usr/local/php/bin:$PATH
+         echo $PATH
+         #/usr/local/php/bin:/usr/local/php/bin:/usr/lib/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+     配置文件中加入环境变量
+         vim /etc/profile
+         在最后一行加上export PATH="/usr/local/php/bin:$PATH"
+           export PATH="/usr/local/mysql/bin:$PATH"
+     重新加载配置 source /etc/profile
      ```
 
-   * ​
+4. 文件和目录的检视    ls 命令
 
+    - `ls  -i`   列出inode( 索引节点 ) 号码
+
+    - `ls  -F`   根据文件 , 目录等资讯 , 给予附加资料结构,
+
+        ​     `*`  代表可执行档 ,  `/ ` 代表目录  ` = ` 代表socket文件  ` | ` 代表FIFO的文件
+
+   - `ls  -n ` 列出UID 与 GID 而非使用者与群组的名称
+
+   - `ls -l --full-time `  显示完整的时间格式
+
+   - `ls --color=never`  不要依据文件特性给予颜色显示  --color=always 显示颜色 --color=auto 让系统自行依据设定来判断是否给予颜色
+
+5. 复制, 删除 和 移动
+
+   * `cp` 复制可以创建 `连结档` 就是快捷方式
+     * `cp  -i`  若目标文件已经存在时, 覆盖时会先询问
+     * `cp  -p`  连同档案的属性一起复制过去, 而非使用预设属性( __备份常用__  )
+     * `cp  -r`  递归持续复制, 用于目录的复制
+     * `cp  -s` 复制成为符号连结档, 亦即 快捷方式
