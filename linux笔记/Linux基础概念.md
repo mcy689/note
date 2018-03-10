@@ -27,11 +27,14 @@
    ```html
    1. 与时间有关的选项
    	-atime  -ctime  -mtime
-   	-mtimen : n为数字, 意义为在n天前的(一天之内)被更改过内容的文件,
+   	-mtime n : n为数字, 意义为在n天前的(一天之内)被更改过内容的文件,
    			 -mtime+n 列出在n天之内(含n天本身)被更改过内容的文件名
-       -newerfile : file为一个存在的文件, 列出比file还要新的文件名
+       -newer file : file为一个存在的文件, 列出比file还要新的文件名
    	例子
-   	  
+   	  find /etc -newer /etc/passwd   查找/etc文件夹下比passwd还新的文件名
+   	  find / -mtime 3                查找三天前的24小时内变动过内容的文件列出
+   	  find / -mtime 0                将过去系统上面24小时内有更动过内容的文件列出来
+   	  find /var -mtime -4            查找4天内被更动过的文件名
    ```
 
    ​
