@@ -263,6 +263,49 @@
 
      ```
 
-   * __当s这个标志出现在文件拥有的x权限上时__ 就被称为 `Set UID ` 
+9. SUID SGID SBIT ( 需要在使用`chmod` 命令时在该权限数字的前面加上对应的权限
 
-     ​
+   ```html
+   chmod u+s filename 设置SUID位
+   chmod u-s filename 去掉SUID设置
+   chmod g+s filename 设置SGID位
+   chmod g-s filename 去掉SGID设置
+   粘滞位权限都是针对其他用户（other）设置，使用chmod命令设置目录权限时，“o+t”、“o-t”权限模式
+   ```
+
+   ​
+
+   - __当s这个标志出现在文件拥有者的x权限上时__ 就被称为 `Set UID ` 
+
+     - SUID 权限__仅对二进制程序(命令)__  有效
+     - 执行者对于该程序需要具有x的权限
+     - 本权限仅在执行该程序的过程中有效
+     - 执行者将具有该程序拥有者的权限
+
+     ```html
+     -rwsr-xr-x. 1 root root 28K Jun 10  2014 /usr/bin/passwd
+     例子
+     	我们的linux系统中, 所有账号的密码都记录在/etc/shadow 这个文件里面, 这个文件的仅有root可读且仅有root可以强制写入, 当普通账户当执行 passwd命令的时候, 由于passwd命令是SUID的, 所以修改密码
+     ```
+
+   - 当s在群组的x时则称为 `set GID` ( 目录或者命令)
+
+     ```html
+     -rwxr-sr-x.  1 root tty     20K Aug  4  2017 write
+
+     程序执行着对于该程序来说, 需要具备x的权限, 执行者在执行的过程中将会获得该程序的群组支援
+     ```
+
+     - 为目录设`SGID`权限
+
+       使用者若对于此目录具有r与x的权限时, 该使用者能够进入此目录, 使用者在此目录下的有效群组将会变成该目录的群组 
+
+   - SBIT 只对目录有效
+
+     ```html
+     drwxrwxrwt.  8 root root 4.0K Mar 10 18:20 tmp
+
+     本身 /tmp 目录的权限, 任何人都可以在/tmp目录内新增, 修改文件, 但是仅有该文件/目录建立者与root能够删除自己的文件或者目录
+     ```
+
+     * 当使用者对于此目录具有`w,x` 权限, 也就是说具有写入权限时, 当使用者在给目录下建立档案或者目录时, 仅有自己与root才有权力删除该文件
