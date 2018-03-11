@@ -44,7 +44,8 @@
    3. 与文件权限以及名称有关的参数
    	-name filename  					查找文件名称为filename的文件
    	-size[+-] SIZE 						查找比SIZE还大的文件
-   	-type Type                          类型有 f为正规文件, b c 装置文件, d 为目录, l 连接档等 
+   	-type Type                          类型有 f为正规文件, b c 装置文件, d 为目录, l 连接档等
+   	-perm [+-] mode    					查找权限
    	例子
    		find -name test.php             搜索文件名称为test.php
    		find /root -size +50k  			搜索比50k还要大的文件
