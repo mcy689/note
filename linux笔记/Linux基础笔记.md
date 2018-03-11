@@ -318,7 +318,84 @@
 
       ```html
       命令行输入 alias  可以查看全部的别名
-
+      例子
+      	type ls   ls is aliased to `ls --color=auto'
+      	type cd   cd is a shell builtin
+      type 命令只找执行文件, 普通的文件时不会显示的
       ```
 
-      ​
+   2. 打印变量
+
+      ```shell
+      打印变量
+          echo $PATH  查看环境变量
+          echo $HOME  查看自己的家目录
+      赋值变量
+          myname=machunyu
+          echo $myname 	machunyu
+      ```
+
+   3. 单引号不解析变量, 双引号解析变量
+
+   4. unset 删除一个变量
+
+      ```html
+      unset myname
+      ```
+
+   5. `\` 转义字符
+
+      ```html
+      例子
+      	name="$name"yes
+      	name=${name}yes
+      ```
+
+   6. 子程序
+
+      ```html
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# echo $myname 
+      yes
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# myname=${myname}yes
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# echo $myname
+      yesyes
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# bash     进入子程序
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# echo $myname
+
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# exit
+      exit
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# echo $myname 
+      yesyes
+      [root@iZ2zef0abwnnrdb06hlftgZ ~]# 
+
+      子程序, 在目前这个shell情况下, 去启动另一个新的shell, 新的那个shell就是子程序, 在一般的状态下, 父程序的自定变量是无法在子程序内使用的. 但是可以通过export将变量变成环境变量后, 就可以在子程序中使用了
+      ```
+
+   7. 在指令下达的过程中, 反单引号  __( ` )__ 这个符号代表的意思
+
+      * 在一串指令中, 在 ` 之内的指令将会被先执行, 而其执行出来的结果将做为外部的输入资讯
+
+        ```shell
+        ls -l `locate crontab`  先将locate 将文件资料都列出来, 再以ls指令来处理
+
+        version=$(uname -r)  也可以这样表示 version=`uname -r`
+        ```
+
+   8. 命令`env` 和 `export` 查看预设的环境变量
+
+      * env 命令
+
+        ```html
+        HOSTNAME=iZ2zef0abwnnrdb06hlftgZ    这部主机的主机名
+        TERM=xterm 							这个终端使用的环境是什么类型的
+        SHELL=/bin/bash						目前这个环境下, 使用的shell是哪个程序
+        HISTSIZE=1000						记录指令的笔数
+        USER=root							
+        PWD=/root							目前使用者所在的工作目录
+        LANG=en_US.UTF-8					语言相关
+        HOME=/root							当前使用者的家目录
+
+        RANDOM   							产生随机数  0~32767之间的数
+        ```
+
+        ​
