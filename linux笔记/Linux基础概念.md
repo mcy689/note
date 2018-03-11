@@ -31,10 +31,24 @@
    			 -mtime+n 列出在n天之内(含n天本身)被更改过内容的文件名
        -newer file : file为一个存在的文件, 列出比file还要新的文件名
    	例子
-   	  find /etc -newer /etc/passwd   查找/etc文件夹下比passwd还新的文件名
-   	  find / -mtime 3                查找三天前的24小时内变动过内容的文件列出
-   	  find / -mtime 0                将过去系统上面24小时内有更动过内容的文件列出来
-   	  find /var -mtime -4            查找4天内被更动过的文件名
+   	  	find /etc -newer /etc/passwd   查找/etc文件夹下比passwd还新的文件名
+   	  	find / -mtime 3                查找三天前的24小时内变动过内容的文件列出
+   	  	find / -mtime 0                将过去系统上面24小时内有更动过内容的文件列出来
+   	  	find /var -mtime -4            查找4天内被更动过的文件名
+   2. 与使用者或群组名称有关的参数 
+   	-user 查找属于某个用户的文件
+   	-nouser 查找无主的文件
+   	例子
+   		find /home -user machunyu       查找/home 底下属于machunyu的文件
+   		find /-nouser 				    透过这个指令, 可以轻易的找到那些不太正常的文件
+   3. 与文件权限以及名称有关的参数
+   	-name filename  					查找文件名称为filename的文件
+   	-size[+-] SIZE 						查找比SIZE还大的文件
+   	-type Type                          类型有 f为正规文件, b c 装置文件, d 为目录, l 连接档等 
+   	例子
+   		find -name test.php             搜索文件名称为test.php
+   		find /root -size +50k  			搜索比50k还要大的文件
+   	
    ```
 
    __注意__ ![IMG_20180311_005731](find+-.jpg)
