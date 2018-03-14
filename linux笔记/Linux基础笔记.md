@@ -444,6 +444,30 @@
        恢复ulimit限制 退出再登录就可以复原
       ```
 
-      ​
+   11. 命令别名与历史命令
 
-      ​
+       ```html
+       clear 来清除屏幕
+       alias lm='ls -la | more'  命名新的命令
+       alias rm='rm -i'  将已有的命令重新命名
+       alias 	想知道当前有哪些别名
+
+       unalias lm  去掉命令的别名
+
+       history  查看历史命令
+       	n 数字 意思是列出最近的n笔命令
+       	-c 将目前shell中的所有history内容全部消除
+       	-a 将目前新增的history指令新增入 histfiles中,如果没有加histfiles,则默认写入 	
+       		~/.bash_history
+       	-r 将histfiles的内容读到目前这个shell的history中
+       	-w 将目前的history记忆内容写入到histfiles中!
+       	示例
+       		history 7  表示显示最近的7条命令
+         		!1023      表示执行历史记录中的第1023行命令
+       		!al        表示执行最近以al为开头的命令
+       		!!         表示执行上一个命令
+       ```
+
+       ​
+
+       ​
