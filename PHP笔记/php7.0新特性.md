@@ -98,3 +98,74 @@
    总结: 这样的类型声明有一个好处就是， 可以让函数方法的形参与返回值有所预期，避免出现不必要的数据传递，从而造成错误。 
 
    ​
+
+3. 匿名类
+
+   * 匿名类的声明与使用是同时进行的, 它具备其他类所具备的所有功能, 差别在于匿名类没有类名. 匿名类的一次性小任务代码流程对性能提升帮助很大
+
+     ```php
+     $name = new class()
+     {
+     	public function __construct()
+     	{
+     		echo 'test';
+     	}
+     };
+     ```
+
+   * 匿名类同样也可以继承的
+
+     ```php
+     class packt
+     {
+     	protected $number;
+
+     	public function __construct()
+     	{
+     		echo 'I am parent construct';
+     	}
+
+     	public function getNumber() : float
+     	{
+     		return $this -> number;
+     	}
+     }
+
+     $num = new class(7) extends packt{
+     	public function __construct(float $number)
+     	{
+     		parent::__construct();
+     		$this -> number = $number;
+     	}
+     };
+     ```
+
+   * 匿名类可以嵌套在一个类中使用
+
+     ```php
+     class Math
+     {
+     	public $first = 10;
+     	public $second = 20;
+
+     	public function add() : float
+     	{
+     		return $this -> first + $this -> second;
+     	}
+
+     	public function multiply()
+     	{
+     		return new class() extends Math {
+     			public function multiply2(float $third)
+     			{
+     				return $this -> add() * $third;
+     			}
+     		};
+     	}
+     }
+     $math = new Math();
+     $res = $math -> multiply() -> multiply2(5);
+     var_dump($res);die;   //150
+     ```
+
+     ​
