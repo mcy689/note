@@ -190,4 +190,22 @@
 
 5. 统一变量语法
 
-   ​
+   ```php
+   /*
+   这段代码在PHP5.x版本中是会被顺利的执行的, 然而, 这样的输出与变量从左到右解析的原则产生了不一致
+   */
+   $first = ['name' => 'second'];
+   $second = 'Howdy';
+   echo $$first['name']; // ${$first['name']} php7.0
+   ```
+
+6. Session_start 函数中的选项数组
+
+   * 在php7.0之前, 当我们要使用session时, 必须先调用 session_start() 函数, 这个函数并没有参数需要传递, 所有session相关的配置都在php.ini文件中。从php7.0开始, 可以在调用函数是传递参数选项数组, 这些设置的信息将覆盖php.ini中的配置
+
+     ```php
+     //设置cookie的有效期时间为1天
+     session_start([
+     	'cookie_lifetime' => 86400,
+     ]);
+     ```
