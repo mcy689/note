@@ -88,47 +88,41 @@
            #    deny  all;
            #}
        }
+          # another virtual host using mix of IP-, name-, and port-based configuration
+          #
+          #server {
+          #    listen       8000;
+          #    listen       somename:8080;
+          #    server_name  somename  alias  another.alias;
 
+          #    location / {
+          #        root   html;
+          #        index  index.html index.htm;
+          #    }
+          #}
+          # HTTPS server
+          #
+          #server {
+          #    listen       443 ssl;
+          #    server_name  localhost;
 
-       # another virtual host using mix of IP-, name-, and port-based configuration
-       #
-       #server {
-       #    listen       8000;
-       #    listen       somename:8080;
-       #    server_name  somename  alias  another.alias;
+          #    ssl_certificate      cert.pem;
+          #    ssl_certificate_key  cert.key;
 
-       #    location / {
-       #        root   html;
-       #        index  index.html index.htm;
-       #    }
-       #}
+          #    ssl_session_cache    shared:SSL:1m;
+          #    ssl_session_timeout  5m;
 
+          #    ssl_ciphers  HIGH:!aNULL:!MD5;
+          #    ssl_prefer_server_ciphers  on;
 
-       # HTTPS server
-       #
-       #server {
-       #    listen       443 ssl;
-       #    server_name  localhost;
-
-       #    ssl_certificate      cert.pem;
-       #    ssl_certificate_key  cert.key;
-
-       #    ssl_session_cache    shared:SSL:1m;
-       #    ssl_session_timeout  5m;
-
-       #    ssl_ciphers  HIGH:!aNULL:!MD5;
-       #    ssl_prefer_server_ciphers  on;
-
-       #    location / {
-       #        root   html;
-       #        index  index.html index.htm;
-       #    }
-       #}
-
-   }
-
+          #    location / {
+          #        root   html;
+          #        index  index.html index.htm;
+          #    }
+          #}
+    }  
    ```
 
-2. Nginx 虚拟主机的配置
+2. Nginx 虚拟主机的配置 
 
-   ​
+
