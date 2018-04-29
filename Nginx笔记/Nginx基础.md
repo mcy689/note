@@ -35,7 +35,7 @@
 
      > 1. `ps -ef | grep nginx`
      >
-     > ![运行时截图](.\运行时截图.png)
+     >    ![运行时截图](运行时截图.png)
      >
      > ​       其中 1 个Nginx 进程的备注信息为 `master process` 表示它为主进程
      >
