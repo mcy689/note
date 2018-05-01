@@ -123,6 +123,95 @@
     }  
    ```
 
-2. Nginx 虚拟主机的配置 
+2. Nginx 虚拟主机的配置 ( 基于域名的配置 )
 
+   ```html
+   server {
+         #配置监听端口
+         listen       80;
+         server_name  yii.domain.com;
+   	  #访问日志文件存放路径
+   	  access_log  /logs/yii.domain.com.log combined;
+         location / {
+             #网站文件存放的目录
+             root   /www/yii; 
+             index  index.html index.htm index.php;
+         }
+   }
+   ```
 
+3. Nginx的自动列表目录配置
+
+   ![图片1](./图片1.png)
+
+4. Nginx 的浏览器本地缓存设置
+
+   ```html
+   #在本地缓存30天
+   location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+   {
+       expires 30d;
+   }
+   #在本地缓存一个小时
+   location ~ .*\.(js|css)?$
+   {
+       expires 1h;
+   }
+   ```
+
+   ​
+
+5. 在不停止Nginx服务的情况下平滑变更Nginx配置
+
+   ```shell
+   #先检查配置文件是否正确
+   nginx -t
+   #查看Nginx主进程号
+   ps -ef | grep nginx
+   #执行平滑变更
+   kill -HUP 主进程号
+   ```
+
+6. Nginx的Rewrite规则与实例
+
+   * Nginx 规则相关指令有if, rewrite, set, return, break
+
+   * break指令 该指令的作用是完成当前的规则集, 不再处理rewrite指令
+
+   * if指令, 该指令用于检查一个条件是否符合, 如果条件符合, 则执行大括号内的语句. if 指令不支持嵌套, 不支持多个条件`&&`或者`||` , 以下信息可以被指定为条件
+
+     1. 变量名
+     2. 变量比较可以使用 `=` ( 表示等于 ) 和 `!=`  ( 表示不等于 ) 运算符;
+     3. 正则表达式模式匹配可以使用 `~` ( 表示区分大小写 )和 `~*` ( 表示不区分大小写 )
+     4. `!~` 和 `!~*` 表示不匹配
+     5. `-f` 和 `!-f` 用来判断文件是否存在
+     6. `-d` 和 `!-d` 用来判断目录是否存在
+     7. `-e` 和 `!-e` 用来判断文件或者目录存在
+     8. `-x` 和 `!-x` 用来判断文件是否可执行 
+
+   * 实战
+
+     ```shell
+     #url中以 .sh 和 .bash 结尾的返回状态码 403
+     location ~ .*\.(sh|bash)?$ {
+         return 403;
+     }
+     #文件和目录不存在时, 重定向到某个PHP文件
+     if (!-e $request_filename) {
+         rewrite ^/(.*)$ /index.php last;
+     }
+     #设置某些类型文件的浏览器缓存时间 在本地缓存30天
+     location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+     {
+         expires 30d;
+     }
+     #在本地缓存一个小时
+     location ~ .*\.(js|css)?$
+     {
+         expires 1h;
+     }
+     ```
+
+     ​
+
+     ​

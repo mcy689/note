@@ -89,3 +89,13 @@
        user = nobody  <!--将这里修改为nginx的用户-->
        group = nobody  <!--将这里修改为nginx的组-->
        ```
+
+     6. 配置开机自启动
+
+        ```html
+        vim /etc/rc.local
+        /usr/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+        /usr/local/php/sbin/php-fpm start
+        ```
+
+        ​
