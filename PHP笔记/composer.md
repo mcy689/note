@@ -65,7 +65,7 @@
 
      ```html
      composer require 
-     命令增加新的依赖包到当期那目录的composer.json 文件中
+     命令增加新的依赖包到当前目录的composer.json 文件中
      ```
 
    * 搜索 `search`
