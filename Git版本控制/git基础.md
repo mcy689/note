@@ -112,8 +112,35 @@
      /vendor
      ```
 
-9. 查看已暂存和未暂存的更新
+9. `git diff`查看已暂存和未暂存的更新
 
-   ​
+   * 直接`git add `, 此命令比较的是工作目录中当前文件和暂存区域快照之间的差异, 也就是修改之后还没有暂存起来的变化内容. __单单`git diff`  命令只是显示还没有暂存起来的改动__ 
 
-   ​
+     ```shell
+     $ git diff
+     diff --git a/server.php b/server.php
+     index e7bb1dd9..c0bfe5f6 100644
+     --- a/server.php
+     +++ b/server.php
+     @@ -20,3 +20,4 @@ if ($uri !== '/' && file_exists(__DIR__.'/public'.$uri)) {
+
+      require_once __DIR__.'/public/index.php';
+      'dddd';
+     +'dddd';
+     ```
+
+   * `git diff --cached` 查看已经暂存起来的文件和上次提交时的快照之间的差异(  `git diff --staged` 高版本也可以使用这个命令, 效果是一样的 )
+
+10. git commit
+
+    * 直接执行 `git commit`
+
+      ![20180501234602](./20180501234602.png)
+
+      __标注的地方用来写说明__
+
+    * git commit -m '2018-5-1 update' 可以使用 -m 参数后跟提交说明
+
+    ​
+
+    ​
