@@ -217,4 +217,79 @@
 
        * 添加远程仓库
 
-         ​
+         ```shell
+          #git remote add [shortname] [url]
+          git remote add origin git@github.com:machunyugit/testgit.git
+          git remote -v
+          origin git@github.com:machunyugit/testgit.git (fetch)
+          origin git@github.com:machunyugit/testgit.git (push)
+         ```
+
+    7. 从远程仓库抓取数据
+
+       * `git clone` 命令本质上就是自动创建了本地的master 分支用于跟踪远程仓库中的master分支, 
+       * `git fetch [remote-name]` 此命令会自动将远程仓库归于origin名下, 所有的`git fetch origin` 会抓取从你上次克隆以来别人上传到此远程仓库中的所有更新
+       * ` git pull url`  设置了某个分支用于跟踪某个远端仓库的分支 , 可以使用`git pull` 命令自动抓取数据下来, 然后将__远端分支自动合并到本地仓库中当前分支__ 
+
+    8. 推送数据到远程仓库
+
+       * git push origin master
+
+         __只要在所克隆的服务器上有写权限, 或者同一时刻没有其他人在推数据, 这条命令才会如期完成任务. 如果在你推数据前已经有其他人推送了若干更新, 那你的推送操作就会被驳回. 你必须先把他们的更新抓取到本地, 合并到自己的项目中, 然后才可以再次推送 __
+
+    9. 查看远程仓库信息
+
+       ```shell
+       #git remote show [remote-name]
+       git remote show origin
+       ```
+
+    10. 远程仓库的删除和重命名
+
+       * 重命名
+
+         ```shell
+         git remote rename origin paul
+         ```
+
+         __注意, 对远程仓库的重命名, 也会使对应的分支名称发生变化, 原来的origin/master 变成了 paul/mater__
+
+       * 删除
+
+         ```shell
+         git remote rm paul
+         ```
+
+         __碰到远端参考服务器迁移, 或者原来的克隆镜像不再使用, 又或者某个参与者不再贡献代码, 那么需要移除对应的远端仓库__
+
+    11. 打标签
+
+        * 列出已有的标签
+
+          ```shell
+          git tag
+          git tag -l 'v3.1.*' #可以查看v3.1系列的版本
+          ```
+
+        * 新建标签
+
+          * 含附注的标签
+
+            ```shell
+            #创建一个含附注类型的标签非常简单, 用 -a ( annotated 的首字母)
+            git tag -a v1.0 -m 'my version 1.0'
+            ```
+
+            __`-m` 选项是指定了对应的标签说明, git 会将此说明一同保存在标签对象中. 如果没有给出该选项, git 会启动文本编辑软件供你输入标签说明__
+
+            __可以使用git show 命令查看相应标签的版本信息, 并连同显示打标签时的提交对象__
+
+             ```shell
+            git show v1.0
+             ```
+
+          * 签署标签
+
+        ​
+
+        ​
