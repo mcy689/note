@@ -290,6 +290,15 @@
 
           * 签署标签
 
-        ​
+    12. 添加多个远程仓库
+
+        ```shell
+        配置远程仓库
+        git remote add origin https://url
+        再添加一个远程仓库
+        git remote set-url --add origin https://url
+        一次提交到所有远程仓库
+        git push --all
+        ```
 
         ​
