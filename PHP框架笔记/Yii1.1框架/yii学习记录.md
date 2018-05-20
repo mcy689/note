@@ -95,9 +95,111 @@
 8.  模型对象
 
    ```php
-   $userModel = Goods::model();
+   <?php
+   class Region extends CActiveRecord
+   {
+       public static function model($className=__CLASS__)
+       {
+           return parent::model($className);
+       }
+       public function tableName()
+       {
+           return '{{region}}';
+       }
+   }
+   $RegionModel = Region::model();
    ```
 
-   ​
+9.  将数据展示到视图模板中
 
-   ​
+   ```php
+                        // 视图    传递到模板的变量  
+   $this -> renderPartial('login',array('name' => '马春雨','age' => 20));
+   ```
+
+10.  执行原生的sql语句
+
+   ```php
+   $sql = 'select id,name,name_py from {{region}} limit 10';
+   $res = Region::model() -> findAllBySql($sql);
+   foreach ($res as $key => $value) {
+   var_dump($value -> name);
+   var_dump($value -> id);
+   var_dump($value -> name_py);
+   }
+   var_dump($res);die;
+   ```
+
+11.  数据的添加
+
+    ```php
+    //1. 单纯的添加
+    $RegionObj = Region::model();
+    $regionObj -> name = '测试';
+    $regionObj -> comment = '评论内容';
+    $regionObj -> save(); 
+    ```
+
+12.  表单小物件
+
+    ```html
+    <!-- <form class="mws-form" action="dashboard.html" method="post"> -->
+    <?php $form = $this->beginWidget('CActiveForm'); ?>
+    <div class="mws-form-row">
+        <div class="mws-form-item">
+        <!-- <input type="text" name="username" value="" class="mws-login-username required" placeholder="username"> -->
+            <?php
+                echo $form->textField($region_model,'name',
+                		array(
+                			'class' => "mws-login-username required",
+                			'placeholder' => 'username',
+               				'value' => $name,
+                		)
+                	);
+             ?>
+        </div>
+    </div>
+    <div class="mws-form-row">
+        <div class="mws-form-item">
+    <!-- <input type="password" name="password" value="" class="mws-login-password required" placeholder="password"> -->
+            <?php
+                echo $form->passwordField($region_model,'name_py',
+                		array(
+                		'class' => 'mws-login-password required',
+                		'placeholder' => 'password',
+                		'value' => $age,
+                	)
+                );
+    		?>
+        </div>
+    </div>
+    <div class="mws-form-row">
+        <input type="submit" value="Login" class="btn btn-success mws-login-button">
+    </div>
+    <?php $this->endwidget(); ?>
+    ```
+
+13.  页面重定向
+
+    ```php
+    $this -> redirect('./index.php?r=site/index');
+    ```
+
+14.  创建模型对象
+
+    1. 模型名:model();
+    2. `new 模型名`
+
+15.  小物件表单展现
+
+    * model  attributeLabels()  模型属性与汉字标签名字对应
+    * controller 将模型传递到视图里边
+    * view  `CaticeForm这个类`
+
+16.  ​
+
+    ​
+
+    ​
+
+    ​
