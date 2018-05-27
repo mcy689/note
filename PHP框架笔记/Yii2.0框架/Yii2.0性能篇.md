@@ -22,7 +22,6 @@ try{
 ```php
 通过__get魔术方法延迟组件类的加载, 将组件的加载延迟到控制器中才加载组件
 $res = \Yii::$app->session;
-var_dump($res);
 ```
 
 #### 数据缓存( 文件缓存 )
@@ -61,7 +60,7 @@ $cache->flush();
   // 缓存依赖
   $dependency = [
   	'class' => 'yii\caching\FileDependency',
-  	'fileName' => 'cachetest',
+  	'fileName' => 'cachetest.txt',
   ];
   //缓存开关
   $enabled = false;
@@ -86,7 +85,7 @@ public function behaviors()
             'only' => ['cachetest'],
             'dependency' => [
                 'class' => 'yii\caching\FileDependency',
-                'fileName' => 'cachetest',
+                'fileName' => 'cachetest.txt',
             ],
         ],
     ];
@@ -96,6 +95,11 @@ public function behaviors()
 #### HTTP缓存
 
 * 网址 `http://www.yiichina.com/doc/guide/2.0/caching-http`
+* __注意 nginx 版本对Etag支持有一个过渡的过程__
+  * 1.3.3版本以下的Nginx是没有Etag功能的
+  * Nginx从1.3.3版开始原生支持Etag，稳定性有风险，
+  * 版本为1.7.3及更高则完美支持Etag
+  * __如果开启了gzip的功能, 会于 Etag功能冲突 ( 网络上有相关的共存的方式, 需要修改nginx源码文件, 并重新编译nginx )__ 
 
 * Web 应用还可以利用客户端缓存 去节省相同页面内容的生成和传输时间。 
 
@@ -110,10 +114,10 @@ public function behaviors()
   	            'class' => 'yii\filters\HttpCache',
   	            'only' => ['httptest'],
   	            'lastModified' => function () {
-  	               return 1527418605;
+  	               return 1527418609;
   	            },
   	            'etagSeed' => function () {
-  	            	return 'etagseed1';
+  	            	return 'etagseed12';
   	            },
   	        ],
       	];
@@ -121,6 +125,3 @@ public function behaviors()
   ```
 
   
-
-
-
