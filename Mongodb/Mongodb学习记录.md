@@ -43,5 +43,34 @@ mongod.exe --dbpath D:\MongoDBDATA
 
 * 默认是用test用户启动mongodb客户端 , 使用超级管理员启动 `mongo 127.0.0.1/admin`
 
-#### 创建数据库
+#### 数据库操作命令
 
+1. 使用use关键字创建数据库
+
+   `use foobar` 
+
+2. 插入一条数据 ` 语法结构 db.documentName.insert({})`
+
+    ` db.persons.insert({"name":"测试"})` 
+
+3. 查看全部数据
+     `show dbs` 
+
+4. 查询数据库中的文档
+     `show collections` 
+
+5. 查看文档(document中的内容)
+
+   ```html
+   db.persons.find()
+   { "_id" : ObjectId("5b12ba34ea0972c724e10b5d"), "name" : "测试" }
+   
+   查看一条数据
+   db.persons.findOne()
+   { "_id" : ObjectId("5b12ba34ea0972c724e10b5d"), "name" : "测试" }
+   ```
+
+6. 更新文档数据
+
+   
+   
