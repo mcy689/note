@@ -288,4 +288,60 @@
 
 1. 指定返回的键
 
-   
+   * db.documentName.find({条件},{需要返回的键});
+
+   ```html
+   > db.persons.find({},{"email":1});
+   { "_id" : ObjectId("5b13a92ca37be50e60cb406b"), "email" : "2442@qq.com" }
+   { "_id" : ObjectId("5b13a954a37be50e60cb406c"), "email" : "2442@qq.com" }
+   { "_id" : ObjectId("5b13a976a37be50e60cb406d"), "email" : "2442@qq.com" }
+   { "_id" : ObjectId("5b13a9a4a37be50e60cb406e"), "email" : "2442@qq.com" }
+   { "_id" : ObjectId("5b13a9b1a37be50e60cb406f"), "email" : "2442@qq.com" }
+   > db.persons.find({},{"email":1,"_id":0});
+   { "email" : "2442@qq.com" }
+   { "email" : "2442@qq.com" }
+   { "email" : "2442@qq.com" }
+   { "email" : "2442@qq.com" }
+   { "email" : "2442@qq.com" }
+   ```
+
+2. 查询条件
+
+   * 小于("$lt")、小于等于("$lte")、大于("$gt")、大于等于("$gte")、不等于("$ne") 。
+
+     ```html
+     #查询年龄大于20且小于30的用户  
+     db.users.find({"age":{$gt:20,"$lte":23}})
+     ```
+
+   * `$in`和`$or`  。对单一键有多个值与其匹配的话就用"$in"，后面跟一个条件数组。
+
+     ```html
+     查询在一个范围
+     > db.users.find({"age":{$in:[23,24]}})
+     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4 }
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23 }
+     查询不在一个范围
+     > db.users.find({"age":{$nin:[23]}})
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23 }
+     查询或者这个或者那个
+     > db.users.find({"$or":[{"age":23},{"name":"robin"}]});
+     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4 }
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23 }
+     >
+     ```
+
+   * Null的用法
+
+     ```html
+     > db.users.find();
+     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n" }
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23 }
+     > db.users.find({"sex":{"$in":[null]}});
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23 }
+     >
+     ```
+
+   * 正则查询
+
+     
