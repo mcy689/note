@@ -52,7 +52,7 @@
 
    * 主键冲突的时候会报错并且停止更新的操作, __其实这个操作更像是将数据删除后又添加的做法__ 
 
-     ![20180603111546](D:\我的文档\GitHub\Mynote\Mongodb\image\20180603111546.png)
+     ![20180603111546](./image/20180603111546.png)
 
    * db.documentName.updated({查询器},{修改器},true) 如果存在就更新, 如果不存在就插入
 
@@ -67,9 +67,9 @@
      db.persons.update({"name":"ceshi"},{"$set":{"name":"ceshi4"}},false,true);
      ```
 
-     ![20180603111546](D:\我的文档\GitHub\Mynote\Mongodb\image\20180603113240.png)
+     ![20180603111546](./image/20180603113240.png)
 
-   ​		
+   	​		
 
 2. 更新器
 
