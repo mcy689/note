@@ -22,13 +22,14 @@ mongodb的参数说明：
 
 ```html
 windows环境启动mongodb 数据库的
+mongod.exe --storageEngine mmapv1 --dbpath D:\MongoDBDATA
 mongod.exe --dbpath D:\MongoDBDATA
 ```
 * 看到这个说明数据库启动成功
 
   ![截图](./image/20180602230520.png)
 
- #### mongodb和关系型数据库的对比
+ #### Mongodb和关系型数据库
 
 |    对比项    |      mongoDB      |     mysql      |
 | :----------: | :---------------: | :------------: |
@@ -39,7 +40,7 @@ mongod.exe --dbpath D:\MongoDBDATA
 |    主外键    |        无         |     pk,fk      |
 | 灵活度扩展性 |       极高        |       差       |
 
-#### mongodb客户端
+#### Mongodb客户端
 
 * 默认是用test用户启动mongodb客户端 , 使用超级管理员启动 `mongo 127.0.0.1/admin`
 
@@ -110,7 +111,10 @@ mongod.exe --dbpath D:\MongoDBDATA
 #### 查看帮助文档
 
 1. 数据库级别的帮助 `db.help()` 
+
 2. 查看集合的帮助 ` db.person.help()`
+
+   ![2018060223291](./image/2018060223291.png)
 
 #### 数据库和集合命名规范
 
@@ -134,19 +138,25 @@ mongod.exe --dbpath D:\MongoDBDATA
      4. MongoDB的文档不能有重复的键。
      5. 文档的键是字符串。除了少数例外情况，键可以使用任意`UTF-8`字符。
 
-#### mongoDB支持的数据类型
+#### MongoDB支持的数据类型
 
 1. String：字符串。存储数据常用的数据类型。在 MongoDB 中，UTF-8 编码的字符串才是合法的。 
-2.  Integer：整型数值。用于存储数值。根据你所采用的服务器，可分为 32 位或 64 位。  
+2. Integer：整型数值。用于存储数值。根据你所采用的服务器，可分为 32 位或 64 位。  
 3. Boolean：布尔值。用于存储布尔值（真/假）。 
 4.  Double：双精度浮点值。用于存储浮点值。 
-5.  Min/Max keys：将一个值与 BSON（二进制的 JSON）元素的最低值和最高值相对比。 
+5.  Min/Max keys：将一个值与 `BSON`（二进制的 JSON）元素的最低值和最高值相对比。 
 6.  Arrays：用于将数组或列表或多个值存储为一个键。  
 7. Timestamp：时间戳。记录文档修改或添加的具体时间。  
-8. Object：用于内嵌文档。  Null：用于创建空值。 
-9. Symbol：符号。该数据类型基本上等同于字符串类型，但不同的是，它一般用于采用特殊符号类型的语言。
-10.  Date：日期时间。用 UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 Date 对象，传入年月日信息。  
-11. Object ID：对象 ID。用于创建文档的 ID。  
-12. Binary Data：二进制数据。用于存储二进制数据。  
-13. Code：代码类型。用于在文档中存储 JavaScript 代码。  
-14. Regular expression：正则表达式类型。用于存储正则表达式。
+8. Object：用于内嵌文档。  
+9. Null：用于创建空值。 
+10. Symbol：符号。该数据类型基本上等同于字符串类型，但不同的是，它一般用于采用特殊符号类型的语言。
+11.  Date：日期时间。用 UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 Date 对象，传入年月日信息。  
+12. Object ID：对象 ID。用于创建文档的 ID。  
+13. Binary Data：二进制数据。用于存储二进制数据。
+14. Code：代码类型。用于在文档中存储 JavaScript 代码。  
+15. Regular expression：正则表达式类型。用于存储正则表达式。
+
+####MongoDB视图工具 mongodbVUE 破解
+
+* windows  ---->  运行  ----> regedit  -----> 查找`4FF78130` ----> 将其中的东西删除
+
