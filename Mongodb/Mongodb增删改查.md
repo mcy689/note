@@ -399,46 +399,4 @@
        { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
        ```
 
-   * $slice 操作返回文档中指定数组的内部值
-
-     ```html
-     返回第二本和第三本书
-     > db.users.find({"name":"robin"},{"booke":{"$slice":[1,2]},"_id":0})
-     { "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "Mongodb", "PHP" ], "size" : 3 }
-     
-     返回最后一本书
-     > db.users.find({"name":"robin"},{"booke":{"$slice":-1},"_id":0})
-     { "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "PHP" ], "size" : 3 }
-     ```
-
-4. 对嵌套文档的查询(对象数组查询`$elemMatch`)
-
-   ```html
-   db.users.find(school:{$elemMatch:{"school":"k","score":"A"}});
-   ```
-
-5. 分页
-
-   ```html
-   //查询一条数据
-   db.users.find().limit(1) 
-   
-   //查询一条数据 跳过一条数据
-   > db.users.find().limit(1).skip(1)
-   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
-   ```
-
-6. 排序
-
-   ```html
-   
-   > db.users.find().limit(2).sort({"age":1});
-   { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
-   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
-   
-   > db.users.find().limit(2).sort({"age":-1});
-   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
-   { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
-   ```
-
-__后期需要补充的知识点 , 游标 和快照的作用__ 
+4. 
