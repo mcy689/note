@@ -1,4 +1,4 @@
-### Mongodb(版本 3.6)
+### Mongodb
 
 #### Mongodb插入数据
 
@@ -342,61 +342,6 @@
      >
      ```
 
-3. 数组查询 
+   * 正则查询
 
-   * `$all`
-
-     ```html
-     查询全部字段
-     > db.users.find({booke:{"$all":["JS"]}});
-     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
-     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA" ] }
      
-     > db.users.find({booke:{"$all":["Mongodb"]}});
-     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
-     查询指定字段
-     > db.users.find({booke:{"$all":["Mongodb"]}},{"booke":1});
-     { "_id" : 3, "booke" : [ "JS", "Mongodb", "PHP" ] }
-     ```
-
-   * 查询数组中第几个值
-
-     ```html
-     查询第一本书是JS的人
-     > db.users.find({"booke.0":"JS"},{"booke":1,"_id":0});
-     { "booke" : [ "JS", "Mongodb", "PHP" ] }
-     { "booke" : [ "JS", "PHP", "JAVA" ] }
-     查询用户第二本书是Mongodb的人
-     > db.users.find({"booke.1":"Mongodb"},{"booke":1,"_id":0});
-     { "booke" : [ "JS", "Mongodb", "PHP" ] }
-     ```
-
-   * $size 查询数组中的长度 
-
-     __这个查询器不能与比较查询符一块使用__
-
-     ```html
-     查询用户的书是4本的
-     
-     > db.users.find();
-     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
-     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ] }
-     > db.users.find({"booke":{$size:4}},{"booke":1,"_id":0});
-     { "booke" : [ "JS", "PHP", "JAVA", "MySQL" ] }
-     ```
-
-   * 查询书籍数量大于3本的学生
-
-     * 第一步添加一个size字段
-
-     * 第二部在每次添加或者删除同时将size字段修改
-
-     * 使用字段size来查询大于或者小于
-
-       ```html
-       > db.users.find();
-       { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
-       { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
-       ```
-
-4. 
