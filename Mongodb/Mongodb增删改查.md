@@ -1,4 +1,4 @@
-### Mongodb
+### Mongodb(版本 3.6)
 
 #### Mongodb插入数据
 
@@ -342,6 +342,103 @@
      >
      ```
 
-   * 正则查询
+3. 数组查询 
 
+   * `$all`
+
+     ```html
+     查询全部字段
+     > db.users.find({booke:{"$all":["JS"]}});
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
+     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA" ] }
      
+     > db.users.find({booke:{"$all":["Mongodb"]}});
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
+     查询指定字段
+     > db.users.find({booke:{"$all":["Mongodb"]}},{"booke":1});
+     { "_id" : 3, "booke" : [ "JS", "Mongodb", "PHP" ] }
+     ```
+
+   * 查询数组中第几个值
+
+     ```html
+     查询第一本书是JS的人
+     > db.users.find({"booke.0":"JS"},{"booke":1,"_id":0});
+     { "booke" : [ "JS", "Mongodb", "PHP" ] }
+     { "booke" : [ "JS", "PHP", "JAVA" ] }
+     查询用户第二本书是Mongodb的人
+     > db.users.find({"booke.1":"Mongodb"},{"booke":1,"_id":0});
+     { "booke" : [ "JS", "Mongodb", "PHP" ] }
+     ```
+
+   * $size 查询数组中的长度 
+
+     __这个查询器不能与比较查询符一块使用__
+
+     ```html
+     查询用户的书是4本的
+     
+     > db.users.find();
+     { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ] }
+     { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ] }
+     > db.users.find({"booke":{$size:4}},{"booke":1,"_id":0});
+     { "booke" : [ "JS", "PHP", "JAVA", "MySQL" ] }
+     ```
+
+   * 查询书籍数量大于3本的学生
+
+     * 第一步添加一个size字段
+
+     * 第二部在每次添加或者删除同时将size字段修改
+
+     * 使用字段size来查询大于或者小于
+
+       ```html
+       > db.users.find();
+       { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
+       { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
+       ```
+
+   * $slice 操作返回文档中指定数组的内部值
+
+     ```html
+     返回第二本和第三本书
+     > db.users.find({"name":"robin"},{"booke":{"$slice":[1,2]},"_id":0})
+     { "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "Mongodb", "PHP" ], "size" : 3 }
+     
+     返回最后一本书
+     > db.users.find({"name":"robin"},{"booke":{"$slice":-1},"_id":0})
+     { "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "PHP" ], "size" : 3 }
+     ```
+
+4. 对嵌套文档的查询(对象数组查询`$elemMatch`)
+
+   ```html
+   db.users.find(school:{$elemMatch:{"school":"k","score":"A"}});
+   ```
+
+5. 分页
+
+   ```html
+   //查询一条数据
+   db.users.find().limit(1) 
+   
+   //查询一条数据 跳过一条数据
+   > db.users.find().limit(1).skip(1)
+   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
+   ```
+
+6. 排序
+
+   ```html
+   
+   > db.users.find().limit(2).sort({"age":1});
+   { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
+   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
+   
+   > db.users.find().limit(2).sort({"age":-1});
+   { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
+   { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
+   ```
+
+__后期需要补充的知识点 , 游标 和快照的作用__ 
