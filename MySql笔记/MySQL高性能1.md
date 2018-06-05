@@ -85,3 +85,62 @@
 
 1. 死锁是指两个或者多个事务在同一资源上相互占用， 并请求锁定对方占用的资源， 从而导致恶性循环的现象，当多个的事务视图以不同的顺序锁定资源时，就可能会产生死锁。多个事务同时锁定同一个资源时，也会产生死锁。
 
+   >事务1
+   >
+   >​	START TRANSACTION;
+   >
+   >​	update stockprice set close = 45.50 where stock_id = 4 and date = '2018-5-1';
+   >
+   >​	update stockprice set close = 45.50 where stock_id = 3 and date = '2018-5-1';
+   >
+   >​	COMMIT;
+   >
+   >事务2
+   >
+   >​	START TRANSACTION;
+   >
+   >​	update stockprice set close = 45.50 where stock_id = 3 and date = '2018-5-1';
+   >
+   >​	update stockprice set close = 45.50 where stock_id = 4 and date = '2018-5-1';
+   >
+   >​	COMMIT;
+   >
+   >如果凑巧，两个事务都执行了第一条UPDATE语句，更新了一行数据，同时也锁定了该行数据，接着每个事务都尝试去执行第二条UPDATE语句，却发现该行已经被对方锁定，然后两个事务都等待对方释放锁，同时又持有对方需要的锁，这陷入死循环。除非有外部因素介入才可能解除死锁。
+
+   #### 事务日志
+
+   事务日志可以帮助提高事务的效率。使用事务日志，存储引擎在修改表的数据时只需要修改其内存拷贝，再把该修改行为记录到持久在硬盘上的事务日志中，而不用每次都将修改的数据本身持久到磁盘。事务日志采用的是追加的方式，因此写日志的操作是磁盘上一小块区域内的顺序 I/O，而不像随机 I/O需要在磁盘的说个地方移动磁头。所以采用事务日志的方式相对来说要快得多。
+
+   #### MySQL中的事务
+
+   1. MySQL默认采用自动提交（autocommit）模式。也就是说，如果不是显示地开始一个事务，则每个查询都被当作一个事务执行提交操作。
+
+      ```mysql
+      mysql> show variables like 'autocommit';
+      +---------------+-------+
+      | Variable_name | Value |
+      +---------------+-------+
+      | autocommit    | ON    |
+      +---------------+-------+
+      1 row in set (0.00 sec)
+      
+      set session transaction isolation level read committed;
+      ```
+
+#### 隐式和显式锁定
+
+InnoDB采用的是两阶段锁定协议。在事务执行过程中，随时都可以执行锁定，锁只有在执行COMMIT或者ROLLBACK的时候才会释放，并且所有的锁是在同一时刻被释放。__隐式锁定__ 
+
+InnoDB还支持通过特定的语句进行__显式锁定__
+
+```mysql
+select ... lock in share mode
+select ... for update
+```
+
+__应用已经将表从MyISAM转换到InnnoDB，但还是显式地使用LOCK TABLES语句。这是没有必要，还会严重影响性能，实际上InnoDB的行级锁工作得更好__
+
+#### 多版本并发控制
+
+
+
