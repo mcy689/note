@@ -37,4 +37,18 @@
    https://app.vagrantup.com/boxes/search?provider=virtualbox
    ```
 
+4. 安装遇到的问题
+
+   ```php
    
+   An error occurred while downloading the remote file. The error
+   message, if any, is reproduced below. Please fix this error and try
+   again.
+   
+   OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 10054
+   
+   vagrant box add laravel/homestead http://atlas.hashicorp.com/laravel/boxes/homestead
+   
+   ```
+
+5. laravel参考文档地址 `http://laravelacademy.org/post/7658.html`;
