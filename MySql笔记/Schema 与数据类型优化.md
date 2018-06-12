@@ -243,10 +243,53 @@
    >   update hit_counter set cnt = cnt + 1;
    >   ```
    >
-   >   问题在于，对于任何想要更新这行的事务来说，这条记录上都有一个全局的互斥锁（mutex）。这会是得这些事务只能串行执行。
+   >2. 问题在于，对于任何想要更新这行的事务来说，这条记录上都有一个全局的互斥锁（mutex）。这会使得这些事务只能串行执行。要想获得更高的并发更新性能。__可以将计数器保存在多行中，每次随机选择一行进行更新。__
    >
-   >​	
-
-   
-
-   
+   >   ```mysql
+   >   create table hit_counter(
+   >   	slot tinyint unsigned not null primary key,
+   >     cnt int unsigned not null
+   >   ) engine = InnoDB;
+   >   
+   >   #预先在表中增加100行数据
+   >   update hit_counter set cnt = cnt + 1 where slot =  '.$randNum;
+   >   ```
+   >
+   >3. 一个常见的需求是每隔一段时间开始一个新的计数器。如果需要这么做，则可以简单地修改一下表
+   >
+   >   ```mysql
+   >   create table daily_hit_counter(
+   >   	day date not null,
+   >       slot tinyint unsigned not null,
+   >       cnt int unsigned not null,
+   >       primary key (day,slot)
+   >   );
+   >   
+   >   insert into daily_hit_counter(day,slot,cnt) values(current_date,rand()*100,1)
+   >   on duplicate key update cnt = cnt + 1;
+   >   ```
+   >
+   >   * 如果在INSERT语句末尾指定了__ON DUPLICATE KEY UPDATE__ ，并且插入行后会导致在一个UNIQUE索引或PRIMARY KEY中出现重复值，则在出现重复值的行执行UPDATE；如果不会导致唯一值列重复的问题，则插入新行。  
+   >   * ON DUPLICATE KEY UPDATE只是MySQL的特有语法，并不是SQL标准语法！ __这个语法和适合用在需要 判断记录是否存在,不存在则插入存在则更新的场景__
+   >
+   >4. 如果希望减少表的行数，以避免表变得太大，可以写一个周期执行的任务，合并所有结果。删除所有其他的数据。
+   >
+   >   ```mysql
+   >   UPDATE daily_hit_counter AS c 
+   >   	INNER JOIN (
+   >   		SELECT
+   >   			DAY,
+   >   			SUM(cnt) AS cnt,
+   >   			MIN(slot) AS mslot
+   >   		FROM
+   >   			daily_hit_counter
+   >   		GROUP BY
+   >   			DAY
+   >   	) AS d USING (DAY) # 相当于 c.day = d.day
+   >   SET c.cnt =
+   >   IF(c.slot = d.mslot, d.cnt, 0),
+   >    c.slot =
+   >   IF(c.slot = d.mslot, 0, c.slot);
+   >   
+   >   delete from daily_hit_counter where slot <> 0 and cnt = 0;
+   >   ```
