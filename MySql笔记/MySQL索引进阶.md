@@ -113,10 +113,155 @@
    * 将选择性最高的列放到索引最前列。
    * 高性能MySQL 第三版 161 页有一个列子。关于索引的区分度不高造成的性能问题。
 
-5. 聚簇索引
+5. 覆盖索引
 
-   * 
+   * 通常大家都会根据查询的 where 条件来创建合适的索引，不过这只是索引优化的一个方面。设计优秀的索引应该考虑到整个查询，而不是单单是 where 条件部分。
 
-名称解释： 
+   * MySQL也可以使用索引来直接获取列的数据。
 
-​	1. ORM：对象关系映射。
+   * 覆盖索引的好处
+
+     1. 索引条目通常远小于数据行大小，所以如果只需要读取索引，那么MySQL就会极大地减少数据访问量。
+
+     2. 因为索引是按照列值顺序存储的（至少在单个页内是如此），所以对于I/O密集型的范围查询会比随机从磁盘读取每一行数据的 I/O 要少得多。
+
+     3. 由于InnoDB的聚簇索引，覆盖索引对InnoDB表特别有用。在索引中满足查询的成本一般比查询行要小得多。
+
+     4. MySQL只有使用 B-Tree 索引做覆盖索引。
+
+     5. 当发起一个被索引覆盖的查询（也叫索引覆盖查询）时，在 EXPLAIN 的 Extra 列可以看到 “Using index” 的信息。
+
+        __如果一个索引包含（或叫覆盖）所有需要查询的字段的值，该索引就叫覆盖索引。__ 
+
+        ![20180613185324](./image/20180613185324.png)
+
+        ```mysql
+        #这是一个多列索引的 username,email
+        mysql> explain select username,email from tbl_users \G;
+        *************************** 1. row ***************************
+                   id: 1
+          select_type: SIMPLE
+                table: tbl_users
+                 type: index
+        possible_keys: NULL
+                  key: user_email
+              key_len: 444
+                  ref: NULL
+                 rows: 1
+                Extra: Using index
+        1 row in set (0.00 sec)
+        ```
+
+     6. 索引覆盖查询还有很多陷阱可能导致无法实现优化。
+
+        ```mysql
+        mysql> explain select * from tbl_users where username = "amdin" and activkey like "%95395930d4dd12b6%" \G;
+        *************************** 1. row ***************************
+                   id: 1
+          select_type: SIMPLE
+                table: tbl_users
+                 type: ref
+        possible_keys: user_email
+                  key: user_email
+              key_len: 60
+                  ref: const
+                 rows: 1
+                Extra: Using where
+        1 row in set (0.00 sec)
+        ```
+
+        没有使用索引的原因
+
+        * 没有任何索引能够覆盖这个查询。因为查询从表中选择了所有的列，而没有任何索引覆盖所有的列。不过，理论上MySQL还有一个捷径可以利用： where 条件中的列是有索引可以覆盖的，因此MySQL可以使用该索引找到对应的 username 并检查 activkey 是否匹配，过滤之后再读取需要的数据行。
+
+        * MySQL不能在索引中执行LIKE操作。这是底层存储引擎API的限制，但是MySQL能在索引中做最左前缀匹配的 LIKE 比较，因为该操作可以转换为简单的比较操作，__但是如果是通配符开头的LIKE查询，存储引擎就无噶做比较匹配。这种情况下，MySQL服务器只能提取数据行的值而不是索引值来做比较。__
+
+        * 优化,建立三列的数据列索引（username, email, activkey）
+
+          ```mysql
+          #优化
+          explain select * from tbl_users a
+          	JOIN (SELECT
+          				username
+          			FROM
+          				tbl_users
+          			WHERE
+          				username = "admin"
+          			and email = 'spzgy03@gmail.com'
+          			AND activkey LIKE "%95395930d4dd12b6%"
+          ) as b on (a.username = b.username)
+          
+          *************************** 1. row ***************************
+                     id: 1
+            select_type: PRIMARY
+                  table: <derived2>
+                   type: system
+          *************************** 2. row ***************************
+                     id: 1
+            select_type: PRIMARY
+                  table: a
+                   type: ref
+          *************************** 3. row ***************************
+                     id: 2
+            select_type: DERIVED
+                  table: tbl_users
+                   type: ref
+          possible_keys: user_email
+                    key: user_email
+                key_len: 444
+                    ref:
+                   rows: 1
+                  Extra: Using where; Using index
+          3 rows in set (0.00 sec)
+          ```
+
+          这种查询叫做  __延迟关联__（deferred join），因为延迟了对列的访问。在查询的第一阶段MySQL可以使用覆盖索引，在 from 子句的子查询中找到匹配的 `username` ，然后根据这些 `username`值在外层查询匹配获取需要的所有列值。虽然无法使用索引覆盖整个查询，但总算比完全无法利用索引覆盖的好。
+
+          ![20180613202038](./image/20180613202038.png)
+
+     7. 使用索引扫描来做排序
+
+        * MySQL有两种方式可以生成有序的结果：通过排序操作；或者按索引顺序扫描；如果 Explain 出来的 type 列的值为 “index”，则说明使用索引扫描来做排序
+
+        * MySQL可以使用同一个索引即满足排序，又用于查找行。因此，如果可能，设计索引时应该尽可能地同时满足这两种任务。
+
+        * 只有当索引的列顺序和order by 子句的顺序完全一致，并且所有列的顺序方向（倒序或者正序）都一样时，MySQL才能够使用索引来对结果做排序。如果查询需要管理多张表，则只有当order by 子句硬哟娜那个的字段全部为第一表时，才能使用索引做排序。
+
+          ```mysql
+          explain select username,email from tbl_users order by id desc
+          ```
+
+     8. 压缩（前缀压缩）索引
+
+        MyISAM 使用前缀压缩来减少索引的大小。
+
+     9. 冗余索引
+
+        大多数情况下都不需要冗余索引，应该尽量扩展已有的索引而不是创建新索引。但也有时候处于性能方面的考虑需要冗余索引，因为扩展已有的索引会导致其变得太大，从而影响其他使用该索引的查询性能。
+
+        ![20180613210938](./image/20180613210938.png)
+
+        ​	索引对插入性能的影响
+
+        ![20180613210938](./image/20180613211206.png)
+
+        
+
+## 名称解释： 
+
+1. ORM：对象关系映射。
+
+2.  二级索引 : 
+
+   * mysql中每个表都有一个聚簇索引（clustered index ），除此之外的表上的每个非聚簇索引都是二级索引，又叫辅助索引（secondary indexes）。
+   * 以InnoDB来说，每个InnoDB表具有一个特殊的索引称为聚集索引。如果您的表上定义有主键，该主键索引是聚集索引。如果你不定义为您的表的主键时，MySQL取第一个唯一索引（unique）而且只含非空列（NOT NULL）作为主键，InnoDB使用它作为聚集索引。如果没有这样的列，InnoDB就自己产生一个这样的ID值，它有六个字节，而且是隐藏的，使其作为聚簇索引。
+
+3. __索引条件下推(5.6的版本)__ ： `http://mdba.cn/2014/01/21/index-condition-pushdownicp%E7%B4%A2%E5%BC%95%E6%9D%A1%E4%BB%B6%E4%B8%8B%E6%8E%A8/`; 这个特性能很好的解决 多列索引，当某列出现了范围索引其他列不能应用索引的问题。
+
+4. **注意的事情** 
+
+   > 顺序的主键什么时候会造成更坏的结果
+   >
+   > 
+   >
+   > 对于高并发工作负载，在InnoDB中按照主键顺序插入可能会造成明显的争用。主键的上界会成为 “热点”。因为所有的插入都发生在这里，所以并发插入可能导致间隙锁竞争。另一个热点可能是`auto_incremect` 锁机制；如果遇到这个问题，则可能需要考虑重新设计表或者应用，或者更改  innodb_autoinc_lock_mode 配置。 
