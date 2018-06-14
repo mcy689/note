@@ -221,7 +221,7 @@
 
      7. 使用索引扫描来做排序
 
-        * MySQL有两种方式可以生成有序的结果：通过排序操作；或者按索引顺序扫描；如果 Explain 出来的 type 列的值为 “index”，则说明使用索引扫描来做排序
+        * MySQL有两种方式可以生成有序的结果：通过排序操作；或者按索引顺序扫描；__如果 Explain 出来的 type 列的值为 “index”，__则说明使用索引扫描来做排序
 
         * MySQL可以使用同一个索引即满足排序，又用于查找行。因此，如果可能，设计索引时应该尽可能地同时满足这两种任务。
 
@@ -245,7 +245,14 @@
 
         ![20180613210938](./image/20180613211206.png)
 
-        
+### 对于大数据量的排序和分页使用延迟关联查询
+
+```mysql
+select cols from progiles join (
+	select <primary key cols > from profiles
+	where x.sex="m" order by rating limit 100000,10
+) as d using(<primary key cols >);
+```
 
 ## 名称解释： 
 
