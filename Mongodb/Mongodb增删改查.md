@@ -73,7 +73,7 @@
 
 2. 更新器
 
-   1. $inc   修改器$inc可以对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。 
+   1. `$inc   修改器$`inc可以对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。 
 
       * id的自动增长
 
@@ -181,7 +181,7 @@
       	)
       ```
 
-   5. $ addToSet操作符为数组添加一个值，如果该值已经存在$ addToSet对该数组不做任何操作。 
+   5. `$addToSet`操作符为数组添加一个值，如果该值已经存在$ addToSet对该数组不做任何操作。 
 
       ```html
       db.persons.update({"_id":6},{$addToSet:{"class":js}})
@@ -307,7 +307,7 @@
 
 2. 查询条件
 
-   * 小于("$lt")、小于等于("$lte")、大于("$gt")、大于等于("$gte")、不等于("$ne") 。
+   * 小于("`$lt`")、小于等于("`$lte`")、大于("`$gt`")、大于等于("`$gte`")、不等于("`$ne`") 。
 
      ```html
      #查询年龄大于20且小于30的用户  
@@ -421,21 +421,24 @@
 
    ```html
    //查询一条数据
-   db.users.find().limit(1) 
+   db.users.find().limit(1)
    
    //查询一条数据 跳过一条数据
    > db.users.find().limit(1).skip(1)
    { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
    ```
+   __skip 会有性能问题可以使用前后台多带一个 _id 字段。__
+
+   `db.users.find({"_id":{$gt:1}}).limit(3)`
 
 6. 排序
 
    ```html
-   
+   正序排序
    > db.users.find().limit(2).sort({"age":1});
    { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
    { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
-   
+   倒序排序
    > db.users.find().limit(2).sort({"age":-1});
    { "_id" : 3, "name" : "robin", "age" : 24, "friends" : 23, "booke" : [ "JS", "Mongodb", "PHP" ], "size" : 3 }
    { "_id" : 2, "name" : "brob", "age" : 23, "friends" : 4, "sex" : "n", "booke" : [ "JS", "PHP", "JAVA", "MySQL" ], "size" : 4 }
