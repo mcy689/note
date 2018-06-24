@@ -7,7 +7,7 @@ mongod --help 查看启动详细参数
 mongodb的参数说明：  
 --dbpath 数据库路径(数据文件)  
 --logpath 日志文件路径  
---master 指定为主机器  
+--master 指定为主机器
 
 --slave 指定为从机器  
 --source 指定主机器的IP地址  

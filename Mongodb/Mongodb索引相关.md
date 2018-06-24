@@ -80,5 +80,5 @@ db.books.find({"name":"0book"}).hint(name:-1);
 
 ### 参考网址
 
-`http://pythonfans.lofter.com/post/3dd906_154c5bd`
-
+1. 创建普通索引 `http://pythonfans.lofter.com/post/3dd906_154c5bd`
+2. 创建空间位置索引 `https://blog.csdn.net/zhangzhebjut/article/details/23021073` 
