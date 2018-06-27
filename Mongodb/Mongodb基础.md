@@ -22,7 +22,7 @@ mongodb的参数说明：
 #### 启动MongoDB
 
 ```html
-windows环境启动mongodb 数据库的
+windows 环境启动 mongodb 数据库的
 mongod.exe --storageEngine mmapv1 --dbpath D:\MongoDBDATA
 mongod.exe --dbpath D:\MongoDBDATA
 ```
