@@ -289,6 +289,7 @@
 1. 指定返回的键
 
    * db.documentName.find({条件},{需要返回的键});
+   * 查询用到的 find() 和 findOne() 两种方式。
 
    ```html
    > db.persons.find({},{"email":1});
