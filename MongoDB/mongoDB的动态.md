@@ -44,6 +44,34 @@
 
 admin（管理员）和 local（本地）是两个特殊的数据库，它们当中的用户可对任何数据库进行操作。这两个数据库中的用户可被看做是超级用户。经验证后，管理员用户可对任何数据库进行读写，同时能够执行某些只有管理员才能执行的命令。
 
+权限文件被保存在 `admin 数据库下的 system.users 集合`
+
+#####配置
+
+1. 启用MongoDB对用户登录和权限的验证
+
+   * 在配置文件中启用   `auth = true`
+   * 在命令行启用   `--atuh`
+
+2. 添加用户
+
+   ```html
+   //添加用户
+   db.createUser({user:"admin",pwd:"password",roles:[{role:"userAdminAnyDatabase",db:"admin"}]});
+   
+   //验证
+   db.auth("admin","password");
+   
+   //移除
+   db.system.user.remove({"user":"admin"});
+   ```
+
+3. 注意
+
+   * 启用身份验证后，客户端必须登录才能进行读写，然而，在MongoDB中有一点值得注意，在admin数据中建立用户前，服务器上的 __本地__ 客户端可对数据库进行读写。
+
+
+
 
 
 
