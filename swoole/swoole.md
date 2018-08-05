@@ -31,4 +31,46 @@ ps aft | grep tcp.php
 1. `swoole_timer_tick` 定时器
    * 定时器仅在当前进程空间内有效
    * 定时器是纯异步实现的，不能与阻塞IO的函数一起使用，否则定时器的执行时间会发生错乱
+2. `swoole_timer_after`函数是一个一次性定时器，执行完成后就会销毁。此函数与`PHP`标准库提供的`sleep`函数不同，`after`是非阻塞的。而`sleep`调用后会导致当前的进程进入阻塞，将无法处理新的请求。---- [swoole官网的解释](https://wiki.swoole.com/wiki/page/319.html)
+
+### 异步redis -- redis 服务器安装
+
+1. redis 服务
+
+2. hiredis 库
+
+   ```
+   去swoole官网下载
+   make -j
+   make install
+   ldconfig   #让linux重新加载配置
+   ```
+
+3. 编译swoole 需要加入  --enable-async-redis
+
+   ```
+   make clean  #清除上一次编译产生的文件
+   ./configure --with-php-config=/usr/local/php/bin/php-config --enable-async-redis
+   make && make install
+   ```
+
+4. 查看是否编译成功
+
+   ```
+   1. php -m 查看是否有swoole模块
+   2. php --ri swoole  查看是否支持 异步redis
+   ```
+
+5. 安装遇到的问题
+
+   ```html
+   编译安装完成以后 执行 php -m 的时候查看不到 swoole 扩展
+   php -c /usr/local/php/etc/php.ini  后出现这个错误 
+   	libhiredis.so.0.13: cannot open shared object file: No such file or director
+   然后通过这样解决的 
+   		echo '/usr/local/lib' >>/etc/ld.so.conf  
+            ldconfig
+   ```
+
+   
 
