@@ -26,5 +26,9 @@ ps aft | grep tcp.php
 * WebSocket 是独立的、创建在 TCP 上的协议。 
 * Websocket 通过 hTTP/1.1 协议的101状态码进行握手。 
 
+### Swoole 定时器
 
+1. `swoole_timer_tick` 定时器
+   * 定时器仅在当前进程空间内有效
+   * 定时器是纯异步实现的，不能与阻塞IO的函数一起使用，否则定时器的执行时间会发生错乱
 
