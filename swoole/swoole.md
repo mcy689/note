@@ -59,6 +59,7 @@ ps aft | grep tcp.php
    ```
    1. php -m 查看是否有swoole模块
    2. php --ri swoole  查看是否支持 异步redis
+      （async redis client => enabled）
    ```
 
 5. 安装遇到的问题
@@ -72,5 +73,8 @@ ps aft | grep tcp.php
             ldconfig
    ```
 
-   
+
+### 进程
+
+* 
 
