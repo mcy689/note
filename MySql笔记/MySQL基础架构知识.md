@@ -140,7 +140,5 @@ select ... for update
 
 __应用已经将表从MyISAM转换到InnnoDB，但还是显式地使用LOCK TABLES语句。这是没有必要，还会严重影响性能，实际上InnoDB的行级锁工作得更好__
 
-#### 多版本并发控制
-
 
 
