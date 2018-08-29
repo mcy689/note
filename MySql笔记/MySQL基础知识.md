@@ -346,6 +346,48 @@ select MOD(3,2)
 
 ## 常用函数
 
+1. concat ( ) 函数，把传入的参数连接成为一个字符串。任何字符串与 null 进行的结果都是 null 。
+
+   ```mysql
+   mysql> select concat('a','b','c');
+   +---------------------+
+   | concat('a','b','c') |
+   +---------------------+
+   | abc                 |
+   +---------------------+
+   1 row in set (0.00 sec)
+   ```
+
+2. insert（str,x,y,instr）函数，将字符串 str 从第 x 位置开始，y个字符长的子串替换为字符串 instr。
+
+   ```mysql
+   mysql> select insert('beijing2008',12,3,'me');
+   +---------------------------------+
+   | insert('beijing2008',12,3,'me') |
+   +---------------------------------+
+   | beijing2008me                   |
+   +---------------------------------+
+   1 row in set (0.00 sec)
+   ```
+
+3. lower( str ) 和 upper( str ) 把字符串转换成小写或者大写。
+
+   ```mysql
+   select lower('DDDD');
+   select upper('dddd');
+   ```
+
+4. left( str,x) 和 right(str,x) 函数，分别返回字符串最左边的x个字符和最后边的x个字符。
+
+   ```mysql
+   mysql> select left('beijing2008',7);
+   +-----------------------+
+   | left('beijing2008',7) |
+   +-----------------------+
+   | beijing               |
+   +-----------------------+.
+   ```
+
 ## 常用的概念
 
 ### 读写锁
