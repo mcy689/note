@@ -1,5 +1,32 @@
 # MySQL数据库基础入门
 
+## 常用命令
+
+```mysql
+# 查看当前时区 
+ show variables like 'time_zone';
+# 修改时区为东九区
+set time_zone='+9:00';
+# 查看默认存储引擎
+show variables like 'default_storage_engine';
+#查看当前默认的存储引擎
+show variables like '%storage_engine%';
+#查看当前支持的存储引擎
+show engines \g
+#修改当前表的存储引擎
+alter table ai engine = innodb;
+# 建表语句
+create table country( 
+    country_id smallint unsigned not null auto_increment, 
+    country varchar(50) not null,
+    last_update datetime,
+    primary key (country_id) 
+) engine=innodb default charset=utf8;
+# 查看数据库一些基本目录
+mysql -uroot -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'
+
+```
+
 ## 基础的入门
 
 1. `drop database 数据库名`        删除数据库
@@ -47,8 +74,8 @@
 
 10. 查看缓存
 
-   1. `show variables like "%query_cache%";` 
-   2. `show status like "%Qcache%"`
+  1. `show variables like "%query_cache%";` 
+  2. `show status like "%Qcache%"`
 
 ## 数据库的索引 
 
@@ -116,16 +143,15 @@ __注意__ :  如果删除primary key 的列那么首先确定是否有`auto_inc
 
 ## 存储引擎  
 
-```mysql
-# 查看默认存储引擎
-show variables like 'default_storage_engine';
-```
+### MyISAM
 
-__注意：__
-
-1. MyISAM表不支持事务，他的优势就是访问速度快，对事务的完整性没有要求或你的程序以select、insert为主的话通常使用MyISAM存储引擎。表锁。
-2. InnoDB：提供事务处理。如果应用程序对事务的完整性要求比较高，并在除了插入和查询外还包括很多的更新、删除操作。就可以使用InnoDB。
-3. 创建表指定存储引擎    `create table 表名 (.......)engine=引擎名;` 
+1. 每个MyISAM在磁盘上存储成3个文件
+   * `.frm（存储表定义）`
+   * `.MYD (MYData，存储数据)`
+   * `.MYI （MYIndex，存储索引）`
+2. 数据文件和索引文件可以放置在不同的目录，平均分布IO，获取更快的速度。
+   * 要指定索引文件和数据文件的路径，需要在创建表的时候通过 `DATA DIRECTORY` 和 `INDEX DIRECTORY` 语句指定。
+   * 文件路径需要是绝对路径，并且具有访问权限。
 
 ## 字符集的查看
 
@@ -137,7 +163,9 @@ __注意：__
 ### 数据库级
 
 ```mysql
+查看当前服务器的字符集      show variables like 'character_set_server';
 查看当前数据库的字符集      show variables like 'character_set_database';
+查看当前数据库的校对规则    show variables like 'collation_database';
 查看系统中可用的字符集		 show character set;
 创建数据库的时候设置字符集   create database 179lamp default character set utf8;
 ```
@@ -387,6 +415,70 @@ select MOD(3,2)
    | beijing               |
    +-----------------------+.
    ```
+
+5. `if( value, t, f )` 如果value是真，返回 t，否则返回 f
+
+   ```mysql
+   mysql> select * from salary;
+   +--------+--------+
+   | userId | salary |
+   +--------+--------+
+   |      1 | 100.00 |
+   |      2 | 200.00 |
+   |      3 | 300.00 |
+   |      4 | 400.00 |
+   |      5 | 500.00 |
+   |      1 |   NULL |
+   +--------+--------+
+   6 rows in set (0.00 sec)
+   
+   mysql> select if(salary>200,'hight','low') from salary;
+   +------------------------------+
+   | if(salary>200,'hight','low') |
+   +------------------------------+
+   | low                          |
+   | low                          |
+   | hight                        |
+   | hight                        |
+   | hight                        |
+   | low                          |
+   +------------------------------+
+   6 rows in set (0.00 sec)
+   ```
+
+6. `ifnull(value,value2) ` 函数，这个函数一般用来替换NULL值
+
+   ```mysql
+   mysql> select ifnull(salary,0) from salary;
+   +------------------+
+   | ifnull(salary,0) |
+   +------------------+
+   |           100.00 |
+   |           200.00 |
+   |           300.00 |
+   |           400.00 |
+   |           500.00 |
+   |             0.00 |
+   +------------------+
+   ```
+
+7. `case when value then result1 else default end `
+
+   ```mysql
+   mysql> select case when salary <= 200 then 'low' else 'high' end from salary;
+   +----------------------------------------------------+
+   | case when salary <= 200 then 'low' else 'high' end |
+   +----------------------------------------------------+
+   | low                                                |
+   | low                                                |
+   | high                                               |
+   | high                                               |
+   | high                                               |
+   | high                                               |
+   +----------------------------------------------------+
+   ```
+
+
 
 ## 常用的概念
 
