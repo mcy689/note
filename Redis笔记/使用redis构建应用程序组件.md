@@ -188,5 +188,142 @@
 
 ## 计数信号量
 
+### 概述
 
+1. 计数信号量是一种锁，它可以让用户限制一项资源最多能够被多少个进程访问，通常用于限定能够同时使用的资源数量。
+2. 需求，构建出一种机制，限制每个账号最多只能有5个__进程__ 同时访问。
 
+### 不公平的计数信号量
+
+每当锁或者信号量因为系统时钟的细微不同导致锁的获取结果出现剧烈变化时，这个锁或者信号量就是不公平的。
+
+代码实现
+
+```php
+<?php
+class RedisBase
+{
+	private static  $instance = NULL;
+	/**
+     * 单例redis 返还此类的唯一实例
+    */
+    public static function getInstance()
+    {
+        if (is_null(self::$instance)) {
+        	$redis = new \Redis();
+        	$redis->connect('localhost', 6379);
+            self::$instance = $redis;
+        }
+        return self::$instance;
+    }
+}
+
+class semaphore
+{
+    private $redis;
+    public function __construct()
+    {
+        $this->redis = RedisBase::getInstance();
+    }
+
+    //产生一个随机的字符串
+    private function genRandomString($length = 30)
+    {
+        $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        $chars = str_shuffle($chars);
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+        }
+        return $str;
+    }
+    /**
+     * 获取一个信号量
+     * @param  [type]  $semname 集合名 也就是每个账号
+     * @param  [type]  $tag     key
+     * @param  [type]  $limit   限制的数量
+     * @param  integer $timeout 超时时间
+     * @return [type]           [description]
+     */
+    public function acquire_semaphore($semname,$limit,$timeout=10000)
+    {
+        $tag = $this->genRandomString();
+
+        $this->redis->multi($this->redis::PIPELINE);
+        //毫秒的时间戳
+        $nowTime = (int)(microtime(true)*1000);
+        //清理过期的信号量
+        $this->redis->zremrangebyscore($semname,'-inf',$nowTime-$timeout);
+        //尝试获取一个信号量
+        $this->redis->zadd($semname,$nowTime,$tag);
+        //获取当前设置的信号量的排行 是从0开始的
+        $this->redis->zrank($semname,$nowTime);
+        $result = $this->redis->exec();
+        if (end($result) < $limit) {
+            //获取成功
+            return $tag;
+        }
+        //获取失败，删除之前添加的信息
+        $this->redis->zrem($semname,$tag);
+        return false;
+    }
+    public function del_semaphore($semname,$tag)
+    {
+        //如果信号量已经被正确的释放了，那么返回true，
+        //返回false则表示该信号量已经因为过期而被删除了
+        return $this->redis->zrem($semname,$tag);
+    }
+}
+$res = new semaphore();
+var_dump($res->acquire_semaphore('testffff',5,10));
+// var_dump($res->del_semaphore('testffff','5j14ldaub74trhmlt45g41u2qumg2d'));
+```
+
+### 公平的信号量
+
+1. 代码实现
+
+   ```php
+   /**
+        * 生成一个公平的信号量
+        * @param  [type]  $semname [description]
+        * @param  [type]  $limit   [description]
+        * @param  integer $timeout [description]
+        * @return [type]           [description]
+        */
+       public function fair_semaphore($semname,$limit,$timeout=10000)
+       {
+           $tag = $this->genRandomString();
+   
+           $czset = $semname.':owner';
+           $ctr = $semname.':counter';
+   
+           $this->redis->multi($this->redis::PIPELINE);
+           //毫秒的时间戳
+           $nowTime = (int)(microtime(true)*1000);
+           //清理过期的信号量
+           $this->redis->zremrangebyscore($semname,'-inf',$nowTime-$timeout);
+           $this->redis->zinterstore($czset,[$semname,$czset]);
+           //对计数器执行自增操作，并获取计数器在执行自增操作之后的值。
+           $this->redis->incr($ctr);
+           $incrVal = $this->redis->exec();
+           $incrVal = end($incrVal);
+           //尝试获取一个信号量
+           $this->redis->multi($this->redis::PIPELINE);
+           $this->redis->zadd($semname,$nowTime,$tag);
+           $this->redis->zadd($czset,$incrVal,$tag);
+           //获取当前设置的信号量的排行 是从0开始的
+           $this->redis->zrank($czset,$tag);
+           $result = $this->redis->exec();
+           if (end($result) < $limit) {
+               //获取成功
+               return $tag;
+           }
+           //获取失败，删除之前添加的信息
+           $this->redis->zrem($semname,$tag);
+           $this->redis->zrem($czset,$tag);
+           return false;
+       }
+   ```
+
+   
