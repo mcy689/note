@@ -180,10 +180,28 @@
    		}
    		return false;
    	}
+       /**
+        * 基于 redis incr 命令实现的锁
+        * @param  [type]  $lockname     [description]
+        * @param  integer $lock_timeout [description]
+        * @return [type]                [description]
+        */
+       public function incrR($lockname,$lock_timeout = 10)
+       {
+           $this->redis->incr($lockname);
+           if ($this->redis->get($lockKey) > 1) {
+               if($redis->ttl($lockKey) == -1){
+                   $redis->expire($lockKey,$lock_timeout);
+               }
+               return false;
+           }
+           return true;
+       }
    }
    
    $lockObj = new lockeRedis();
    var_dump($lockObj->setnxR('mcy689',10,10));
+   //另一种方法
    ```
 
 ## 计数信号量
@@ -326,4 +344,7 @@ var_dump($res->acquire_semaphore('testffff',5,10));
        }
    ```
 
-   
+2. 为了消除竞态，也需要在获取标识的时候，获取锁。
+
+
+
