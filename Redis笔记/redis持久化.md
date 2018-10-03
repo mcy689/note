@@ -166,3 +166,5 @@ Redis支持两种方式的持久化 (实际使用的时候是将下面的二者�
 
 ###  注意事项
 
+固态硬盘 和 appendfsync always 使用固态硬盘的用户请谨慎 appendfsync  always 选项，因为这个选项让 Redis 每次只写入一个命令，而不是像其他 appendfsync 选项那样一次写入多个命令，这种不断地写入少量数据的做法有可能引发严重的写入放大（write amplification）问题，在某些情况下甚至会将固态硬盘的寿命从原来的几年降低为几个月。
+
