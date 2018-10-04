@@ -1,4 +1,6 @@
-### redis的事务(可以用来解决竞态条件的方法)
+# redis杂项
+
+## Redis事务
 
 1. 实践使用redis来存储微博中的用户关系
 
@@ -86,12 +88,9 @@
    #在代码中会判断要赋值的字段是否存在, 如果字段不存在的话就不执行事务中的命令, 但需要使用unwatch命令来保证下一个事务的执行不会受到影响
    ```
 
+---
 
-------
-
-
-
-#### 过期时间
+## 过期时间
 
 1. 实际的开发中, 如限时优惠活动, 缓存或验证码
 
@@ -99,18 +98,18 @@
 
    ```html
    expire   key  seconds    表示键的过期时间, 单位秒,必须是整秒
-
+   
    ttl  key    查询键的剩余时间, 当键不存在时会返回-2
                建立一个键后的默认情况(无过期时间)会返回-1
    清除过期时间
    	persist  可以取消过期时间设置(将键回复成永久的) 
             	 过期时间被成功清除这返回1, 否则返回0(因为键不存在或者本来就是永久的)
-
+   
        除了使用上一个命令为,使用set或者getset命令为键服务值也会同时清除键的过期时间
-
+   
    	pexpipe key 1     时间单位是毫秒
    	pttl    key       命令以毫秒为单位返回键的剩余时间
-
+   
    expireat  key timestamp   第二个参数使用unix时间作为第二个参数表示键的过期时刻
    pexpireat key timestamp   这个单位是毫秒
    ```
@@ -426,5 +425,23 @@
 
         当一组命令中每条命令都不依赖于之前命令的执行结果时就可以将这组命令一起通过管道发出, 管道通过减少客户端与redis的通信次数来实现降低往返时延累计值的目的
 
+---
 
+## 处理系统故障
+
+1. Redis [官方地址](https://redis.io/topics/persistence)。
+
+## Redis的性能测试程序
+
+```html
+redis-benchmark [-h <host>] [-p <port>] [-c <clients>] [-n <requests]> [-k <boolean>]
+  
+ -h <hostname>      Server hostname (default 127.0.0.1)
+ -p <port>          Server port (default 6379)
+ -s <socket>        Server socket (overrides host and port)
+ -a <password>      Password for Redis Auth
+ -c <clients>       Number of parallel connections (default 50)
+ -n <requests>      Total number of requests (default 100000)
+ -d <size>          Data size of SET/GET value in bytes (default 2)
+```
 

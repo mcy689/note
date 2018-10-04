@@ -409,3 +409,5 @@
    ```
 
 3. Rdbtools 是一个Redis的快照文件解析器, 可以根据快照文件导出json数据文件, 分析Redis中每个键的占用空间情况。
+
+4. Redis 中的 [Info 命令](https://redis.io/commands/INFO)说明。
