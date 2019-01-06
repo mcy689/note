@@ -168,7 +168,72 @@
 
 ### 数组和指针
 
+1. 数组和指针
+   * 数组是相同类型的对象集合
+   * 指针是一个变量，它的值是给定类型的另一个变量或者常量的地址。使用指针可以在不同的时间访问不同的变量，只要它们类型相同即可。
 
+2. 如果需要传入一个引用，但没有使用 & 运算符，而是使用数组名称，同时也没有带索引值，它就引用数组的__第一个元素的地址__ 。但数组不是指针，它们有一个重要区别：可以改变指着包含的地址，但不能改变数组名称引用的地址。
+
+   ```c
+   #include <stdio.h>
+   int main()
+   {
+       char multiple [] = "My string";
+       char *p = &multiple[0];
+       printf("The address of the first array element : %p\n",p);
+       p = multiple;
+       printf("The address of the first array name:%p\n",multiple);
+       return 0;
+   }
+   ```
+
+3. 指针地址的累加。
+
+   ```c
+   #include <stdio.h>
+   #include <string.h>
+   // #include <stdlib.h>
+   int main(void)
+   {
+       char multiple[] = "a string";
+       char *p = multiple;
+   
+       for(int i =0;i < strnlen(multiple,sizeof(multiple));i++){
+           printf("multiple[%d] = %c *(p+%d) = %c &multiple[%d] = %p p+%d = %p\n",i,multiple[i],i,*(p+i),i,&multiple[i],i,p+i);
+       }
+       return 0;
+   }
+   ```
+
+### 多维数组和指针
+
+1. 如下代码
+
+   ```c
+   #include <stdio.h>
+   int main(void)
+   {
+       char board[3][3] = {
+           {'1','2','3'},
+           {'4','5','6'},
+           {'7','8','9'}
+       };
+       printf("address of board :%p\n",board);
+       printf("address of board[0][0]:%p\n",&board[0][0]);
+       printf("value of board[0]:%p\n",board[0]);
+       return 0;
+   }
+   //输出结果
+   /*
+   address of board :0x7ffee1b2fb8f
+   address of board[0][0]:0x7ffee1b2fb8f
+   value of board[0]:0x7ffee1b2fb8f
+   */
+   ```
+
+   * 3个输出值都是相同的，说明：声明一维数组 `x[n1]`时，`[n1]`放在数组名称之后，告诉编译器它是一个有n1个元素的数组，声明二维数组`y[n1][n2]` 时，编译器就会创建一个大小为n1的数组，它的每个元素是一个大小为n2的数组。
+   * 声明二维数组时，就是在创建一个数组的数组，因此，用数组名称和一个索引值访问这个二维数组时，例如 `board[0]`，就是在引用一个子数组的地址。仅使用二维数组名称，就是引用该二维数组的开始地址，它也是第一个子数组的开始地址。
+   * board、`board[0]` 和 `&board[0]`的数值相同，但它们并不是相同的东西，board 是char型二维数组的地址，`board[0]` 是char 型以为子数组的地址，它是 board 的一个子数组，`&board[0][0]`是char型数组元素的地址。
 
 
 
