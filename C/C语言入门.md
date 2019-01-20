@@ -304,3 +304,63 @@
 
 ### 动态内存分配：malloc() 函数
 
+分配25个 int 值的内存
+
+```c
+int *pNumber = (int*)malloc(25*sizeof(int));
+```
+
+### 释放动态分配的内存
+
+要释放动态分配的内存，必须能访问引用内存快的地址。
+
+```c
+//要释放动态分配的内存，而该内存的地址存储在 pNumber 指针中。
+free(pNumber);
+pNumber = NULL;
+```
+
+### 用 calloc() 函数分配内存
+
+1. 它北内存分配为给定大小的数组，
+
+2. 它初始化了所分配的内存，所有的位都是0。
+
+3. 分配75个 int 元素的数组分配内存。
+
+   ```c
+   int *pNumber = (int*) calloc(75,sizeof(int));
+   ```
+
+### realloc() 函数扩展内存
+
+```c
+int current_element = 0;
+int total_element = 128;
+char *dynamic_arr = (char *)malloc(total_element);
+void add_element(char c)
+{
+  if(current_element == total_element-1)
+  {
+    char *p_temp = NULL;    //很关键
+    total_element*=2;    //给内存扩容，一般都是直接扩大为2倍
+    p_temp = (char *)realloc(dynamic_arr, total_element);
+    if(p_temp == NULL) 
+    {
+      printf("扩展表内存失败！");
+      return;
+    }
+    dynamic_arr = p_temp;
+  }
+  current_element++;
+  dynamic_arr[current_element] = c;
+}
+```
+
+### 规则
+
+1. 避免分配大量的小内存块，分配堆上的内存有一些系统开销，所以分配许多小的内存块比分配几个大内存块的系统开销大。
+2. 仅在需要时分配内存。只要使用完堆上的内存块，就释放它。
+3. 总是确保释放已分配的内存，在编写分配内存的代码时，就要确定在代码的什么地方释放内存。
+4. 在释放内存之前，确保不会无意中覆盖堆上已分配的内存的地址，否则程序就会出现内存泄露。在循环中分配内存时，尤其需要注意。
+5. **内存泄露** 指由于疏忽或错误造成程序未能释放已经不再使用的内存。
