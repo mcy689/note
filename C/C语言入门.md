@@ -385,3 +385,33 @@ void add_element(char c)
 
 ### 变量的作用域和生存期
 
+1. 变量只存在于定义它们的块中，他们在声明时创建，在遇到下一个闭括号时就不存在了。
+
+2. 在一个块内的其他块中声明的变量也是这样。
+
+3. 变量在一个块内声明时创建，在这个块结束时销毁，这中变量称为自动变量。
+
+   ```c
+   {
+       int a = 0; //create a
+       // reference to a is ok here
+       // reference to b is an error here - it hasn't been created yet
+       {
+           int b = 10;  // create b
+       }
+       // refernce to b is an error here - it has been destroyed
+       // reference to a is ok here
+   }
+   ```
+
+4. 希望返回一个能灵活返回指向各种类型的地址时，就可以使用`void *`。
+
+### 按值传递机制
+
+1. 给函数传送变量时，变量值不会直接传递个函数，而是先制作变量的副本，存储在栈上，再时这个副本可用于函数，而不是使用初始值。
+2. 给函数传递变量的地址，它只是传递地址的副本，而不是初始的地址。但是，副本仍是一个地址，仍引用最初的变量。
+
+## 函数再探
+
+
+
