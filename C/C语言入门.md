@@ -339,7 +339,7 @@ pNumber = NULL;
 
 ### 用 calloc() 函数分配内存
 
-1. 它北内存分配为给定大小的数组，
+1. 它给内存分配为给定大小的数组，
 
 2. 它初始化了所分配的内存，所有的位都是0。
 
@@ -413,5 +413,147 @@ void add_element(char c)
 
 ## 函数再探
 
+### 函数指针
 
+1. 函数的内存地址存储了函数开始执行的位置（起始地址），存储在函数指针中的内容就是这个地址。
+
+2. 声明函数指针
+
+   ```c
+   //这个指针的名称是 pfunction，指向一个参数是 int 类型、返回值是int类型的函数。
+   int (*pfunction) (int)
+   ```
+
+### 通过函数指针调用函数
+
+```c
+//1. 假定定义如下函数原型
+int sum(int a,int b); //calculates a+b
+//2. 它的地址存储在声明如下的函数指针中：
+int (*pfun)(int,int) = sum;
+//3. 通过函数指针调用sum()函数。
+int result = pfun(45,55);
+
+//示例
+#include <stdio.h>
+int sum(int,int);
+int product(int,int);
+int difference(int,int);
+int main()
+{
+    int a = 10;
+    int b = 5;
+    int result = 0;
+    int (*pfun)(int,int);
+
+    pfun =sum;
+    result = pfun(a,b);
+    printf("pfun = sum result = %2d\n",result);
+
+    pfun = product;
+    result = pfun(a,b);
+    printf("pfun = product result = %2d\n",result);
+
+    pfun = difference;
+    result = pfun(a,b);
+    printf("pfun = difference result = %2d\n",result);
+    return 0;
+}
+int sum(int x,int y)
+{
+    return x+y;
+}
+int product(int x,int y)
+{
+    return x*y;
+}
+int difference(int x,int y)
+{
+    return x - y;
+}
+```
+
+### 函数指针的数组
+
+```c
+//声明函数指针数组。
+int (*pfunctions[10]) (int);
+
+//示例
+#include <stdio.h>
+int sum(int,int);
+int product(int,int);
+int difference(int,int);
+int main()
+{
+    int a = 10;
+    int b = 5;
+    int result = 0;
+    int (*pfun[3])(int,int);
+    pfun[0] =sum;
+    pfun[1] = product;
+    pfun[2] = difference;
+    for(int i = 0; i < 3; ++i){
+        result = pfun[i](a,b);
+        printf("result = %d\n",result);
+    }
+    result = pfun[1](pfun[0](a,b),pfun[2](a,b));
+    printf("result = %2d\n",result);
+    return 0;
+}
+int sum(int x,int y)
+{
+    return x+y;
+}
+int product(int x,int y)
+{
+    return x*y;
+}
+int difference(int x,int y)
+{
+    return x - y;
+}
+```
+
+### 作为变元的函数指针
+
+可以将函数指针作为变量来传递，这样就可以根据指针所指向的函数而调用不同的函数了。
+
+```c
+#include <stdio.h>
+int sum(int,int);
+int product(int,int);
+int difference(int,int);
+int any_function(int(*pfun)(int,int),int x,int y);
+int main()
+{
+    int a = 10;
+    int b = 5;
+    int result = 0;
+    int (*pf)(int,int) = sum;
+
+    printf("result = %2d\n",any_function(pf,a,b));
+    printf("result = %2d\n",any_function(product,a,b));
+    printf("result = %2d\n",any_function(difference,a,b));
+    return 0;
+}
+int any_function(int(*pfun)(int,int),int x, int y)
+{
+    return pfun(x,y);
+}
+int sum(int x,int y)
+{
+    return x+y;
+}
+int product(int x,int y)
+{
+    return x*y;
+}
+int difference(int x,int y)
+{
+    return x - y;
+}
+```
+
+### 静态变量：函数内部的追踪
 
