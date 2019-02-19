@@ -215,3 +215,22 @@ MySQL 的行锁是在引擎层由各个引擎自己实现的。
 2. 第二种策略：每个新来的被堵住的线程，都要判断会不会由于自己的加入导致了死锁，这是一个时间复杂度是 O(n) 的操作。假设有 1000 个并发线程要同时更新同一行，那么死锁检测操作就是 100 万这个量级的。虽然最终检测的结果是没有死锁，但是这期间要消耗大量的 CPU 资源。因此，你就会看到 CPU 利用率很高，但是每秒却执行不了几个事务。
 3. 你可以考虑通过将一行改成逻辑上的多行来减少锁冲突。还是以影院账户为例，可以考虑放在多条记录上，比如 10 个记录，影院的账户总额等于这 10 个记录的值的总和。这样每次要给影院账户加金额的时候，随机选其中一条记录来加。这样每次冲突概率变成原来的 1/10，可以减少锁等待个数，也就减少了死锁检测的 CPU 消耗。
 
+## 事务
+
+1. 语法：
+
+   ```mysql
+   START TRANSACTION
+       [transaction_characteristic [, transaction_characteristic] ...]
+   
+   transaction_characteristic: {
+       WITH CONSISTENT SNAPSHOT # 
+     | READ WRITE
+     | READ ONLY
+   }
+   
+   BEGIN [WORK]
+   COMMIT [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+   ROLLBACK [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+   SET autocommit = {0 | 1}
+   ```
