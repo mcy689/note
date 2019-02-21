@@ -217,20 +217,37 @@ MySQL 的行锁是在引擎层由各个引擎自己实现的。
 
 ## 事务
 
-1. 语法：
+### 例子
 
-   ```mysql
-   START TRANSACTION
-       [transaction_characteristic [, transaction_characteristic] ...]
-   
-   transaction_characteristic: {
-       WITH CONSISTENT SNAPSHOT # 
-     | READ WRITE
-     | READ ONLY
-   }
-   
-   BEGIN [WORK]
-   COMMIT [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
-   ROLLBACK [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
-   SET autocommit = {0 | 1}
-   ```
+![](./image/transaction.jpeg)
+
+**事务 B 查到的 k 的值是3，而事务 A 查到的 k 的值是1。**
+
+1. `begin/start transaction` 命令并不是一个事务的起点，在执行到它们之后的第一个操作 InnoDB 表的语句，事务才真正启动。如果你想要马上启动一个事务，可以使用 `start transaction with consistent snapshot` 这个命令。
+2. 事务 C 没有显式地使用 `begin/commit` ,表示这个 `update` 语句本身就是一个事务，语句完成的时候会自动提交。
+
+### MySQL 有两个“视图”概念
+
+1. 一个是 view。它是一个用于查询语句定义的虚拟表，在调用的时候执行查询语句并生成结果。
+2. 另一个是 InnoDB 在实现 MVCC 时用到的一致性读视图，即 consistent read view。用于支持 RC（read committed，读提交）和 RR（repeatable read，可重复读）隔离级别的实现。
+3. 它没有物理结构，作用是事务执行期间用来定义“我能看到什么数据”。
+
+### “快照” 在 MVCC 里是如何工作的
+
+1. 在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。这个快照是基于整库的。
+
+2. InnoDB 里面每个事务有一个唯一的事务 ID，叫作 transaction_id。它是在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。
+
+3. 每行数据也都是有多个版本的。每次事物更新数据的时候，都会生成一个新的数据版本，并且把 transaction_id 赋值给这个数据版本的事务 ID，记为 row trx_id。同时，旧的数据版本要保留，并且在新的数据版本中，能够有信息可以直接拿到它。也就是说，数据表中的一行记录，其实可能有多个版本（row），每个版本有自己的 row trx_id。
+
+   ![](./image/transaction2.jpeg)
+
+   图中虚线框里是同一行数据的4个版本。
+
+4. 图中3个虚线箭头，就是 undo log；而 V1、V2、V3 并不是物理上真实存在的，而是每次需要的时候根据当前版本和 undo log 计算出来的。比如，需要 V2 的时候，就通过 V4 依次执行 U3、U2算出来。
+
+5. 在实现上，InnoDB 为每个事务构造了一个数组，用来保存这个事务启动瞬间，当前正在“活跃”的事务ID。”活跃“指的就是，启动了但还没有提交。
+
+6. 数组里面事务 ID 的最小值记为底水位，当前系统里面已经创建过的事务 ID 的最大值加1记为高水位。这个视图数组和高水位，就组成了当前事务的一致性视图（read-view）。
+
+7. 数据版本的可见性规则，就是基于数据的 row trx_id 和这个一致性视图的对比结果得到的。
