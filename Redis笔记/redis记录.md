@@ -14,9 +14,19 @@
 
 5. 延时队列
 
-   * 有序集合
-   * zrem 删除
-   * lua脚本，原子处理
+   ```php
+   $scriptLua = <<<LUA
+           local tabSoreSet = {};
+           tabSoreSet = redis.pcall('ZRANGEBYSCORE',KEYS[1],KEYS[2],KEYS[3],'limit',0,1);
+           if (next(tabSoreSet) == nil) then
+               return false;
+           end;
+           local member = tabSoreSet[1];
+           redis.pcall('zrem',KEYS[1],member);
+           return member;
+   LUA
+   $redis->eval($scriptLua,array('rediskey',0,$nowTime),3);
+   ```
 
 6. redis 插件
 
@@ -68,8 +78,23 @@
 
 ## stream 数据结构
 
-1. 有一个消息链表，将所有加入的消费都串起来，每个消息都有一个唯一的ID和对应的内容。消息是持久化的，redis 重启后，内容还在。
-2. 每个 stream 都可以挂多个消费组，每个消费组会有一个游标 `last_dekuvered_id` 在 Stream 数组之上往前移动，表示当前消费组已经消费到哪条消息了。每个消费组都有一个 stream 内唯一的名称，消费组不会自动创建，它需要单独的指令 `xgroup create` 进行创建，需要制定从 stream 的某个消息ID开始消费，这个 ID 用来初始化 `last_delivered_id` 变量。
-3. 每一个消费组（consumer group）的状态都是独立的，相互不受影响。也就是说同一份 stream 内部的消息会被每个消费组都消费到。
-4. 同一个消费组可以挂接多个消费者（consumer），这些消费者之间是竞争关系，任意一个消费读取了消费都会使游标 `last_delivered_id` 往前移动。每个消费者有一个组内唯一名称。
+1.  **Stream**，它是一个新的强大的支持多播的可持久化的消息队列。
+2. 有一个消息链表，将所有加入的消费都串起来，每个消息都有一个唯一的ID和对应的内容。消息是持久化的，redis 重启后，内容还在。
+3. 每个 stream 都可以挂多个消费组，每个消费组会有一个游标 `last_dekuvered_id` 在 Stream 数组之上往前移动，表示当前消费组已经消费到哪条消息了。每个消费组都有一个 stream 内唯一的名称，消费组不会自动创建，它需要单独的指令 `xgroup create` 进行创建，需要制定从 stream 的某个消息ID开始消费，这个 ID 用来初始化 `last_delivered_id` 变量。
+4. 每一个消费组（consumer group）的状态都是独立的，相互不受影响。也就是说同一份 stream 内部的消息会被每个消费组都消费到。
+5. 同一个消费组可以挂接多个消费者（consumer），这些消费者之间是竞争关系，任意一个消费读取了消费都会使游标 `last_delivered_id` 往前移动。每个消费者有一个组内唯一名称。
+
+## Info 指令
+
+### 参数配置
+
+1. Server 服务器运行的环境参数
+2. Clients 客户端相关信息
+3. Memory 服务器运行内存统计数据
+4. Persistence 持久化信息
+5. Stats 通用统计数据
+6. Replication 主从复制相关信息
+7. CPU CPU 使用情况
+8. Cluster 集群信息
+9. KeySpace 键值对统计数量信息
 
