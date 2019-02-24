@@ -4,7 +4,7 @@
 
 1. `incr` 命令是有范围的 `signed long 也就是 2^63` ，超过这个最大值，redis就会报错。
 
-   ![incr](/Users/machunyu/Documents/GitHub/Mynote/Redis笔记/image/incr.png)
+   ![incr](./image/incr.png)
 
 2. 设置一个定长的列表 `ltrim log 0 99`
 
