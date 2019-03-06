@@ -356,3 +356,26 @@ Redo log 主要节省的是随机写磁盘的 IO 消耗（转成顺序写），�
 
 ### InnoDB 刷脏页的控制策略
 
+1. IOPS**（Input/Output Operations Per Second）是一个用于计算机存储设备（如硬盘（HDD）、固态硬盘（SSD）或存储区域网络（SAN））性能测试的量测方式，可以视为是每秒的读写次数。
+
+2.  `innodb_io_capacity` 这个参数，可以告诉 InnoDB 你的磁盘能力。建议设置成池盘的 IOPS。
+
+   * 查看这个参数的默认值
+
+   ![io](./image/io.png)
+
+   ​	
+
+   * 查看磁盘的 IOPS。通过 fio 这个工具来测试。
+
+     ```shell
+     fio -filename=/root/redo.log -direct=1 -iodepth 1 -thread -rw=randrw -ioengine=psync -bs=16k -size=500M -numjobs=10 -runtime=10 -group_reporting -name=mytest
+     ```
+
+3. InnoDB 的刷盘速度就是参考这两个因素：一个是脏页比例，一个是 redo log 写盘速度。
+
+4. `innodb_max_dirty_pages_pct` 是脏页比例上限，默认值为 75%。
+
+   ![io](./image/2.png)
+
+5. 平时要多关注脏页比例，不要让它经常接近 75%。
