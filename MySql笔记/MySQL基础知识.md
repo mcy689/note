@@ -24,7 +24,8 @@ create table country(
 ) engine=innodb default charset=utf8;
 # 查看数据库一些基本目录
 mysql -uroot -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'
-
+# 重启mysql
+/usr/local/mysql/support-files/mysql.server restart
 ```
 
 ## 基础的入门
