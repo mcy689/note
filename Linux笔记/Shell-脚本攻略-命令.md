@@ -3,9 +3,9 @@
 ## cat 命令
 
 ```shell
-cat -s file.txt  				#压缩连续的空白行输出
-cat -s file.txt | tr -s '\n'	#压缩并移除空白行  说明:tr -s '\n' 将连续多个'\n'字符压缩成单个'\n'
-cat -t table.log 				#查看制表符	说明：这个命令可以将连续的空格区和制表符区分开
+cat -s file.txt                     #压缩连续的空白行输出
+cat -s file.txt | tr -s '\n'        #压缩并移除空白行  说明:tr -s '\n' 将连续多个'\n'字符压缩成单个'\n'
+cat -t table.log                    #查看制表符 说明：这个命令可以将连续的空格区和制表符区分开
 ```
 
 ## 录制与回放终端会话文件和数据
@@ -40,14 +40,14 @@ cat -t table.log 				#查看制表符	说明：这个命令可以将连续的空
 1. 基本命令
 
    ```shell
-   find base_path 					#要列出当前目录及子目录下所有的文件和文件夹
-   find studyC/ -print 			#打印文件和目录的列表
-   find ./ -name "*.php" -print	#查找当前目录下所有以php结尾的文件，并打印出文件
-   find ./ -iname "t*.php" -print	#查找当前目录下所有以 t （不区分大小写）和 .php 结尾的文件
-   find . \( -name "*.pdf" -o -name "*.txt" \) -print #匹配多个条件中的一个，采用OR条件操作
-   find ../ iregex ".*\( \.php\|\.sh)" #查看 .php 或者 .sh 文件
-   find . ! -name "*.txt" -print	#否定参数，查看除了txt文件的其他文件
-   find -maxdepth 1 -type f -print #指定find的向下查找的深度。查找普通文件
+   find base_path                       #要列出当前目录及子目录下所有的文件和文件夹
+   find studyC/ -print                  #打印文件和目录的列表
+   find ./ -name "*.php" -print         #查找当前目录下所有以php结尾的文件，并打印出文件
+   find ./ -iname "t*.php" -print       #查找当前目录下所有以 t （不区分大小写）和 .php 结尾的文件
+   find . \( -name "*.pdf" -o -name "*.txt" \) -print   #匹配多个条件中的一个，采用OR条件操作
+   find ../ iregex ".*\( \.php\|\.sh)"  #查看 .php 或者 .sh 文件
+   find . ! -name "*.txt" -print        #否定参数，查看除了txt文件的其他文件
+   find -maxdepth 1 -type f -print      #指定find的向下查找的深度。查找普通文件
    ```
 
 2. 根据类型查找
@@ -70,7 +70,7 @@ cat -t table.log 				#查看制表符	说明：这个命令可以将连续的空
    # -amin 访问时间 -mmin 修改时间 -ctime 变化时间 时间单位：分
    find . -type f -amin -7 -print  #打印出访问时间小于7分钟的文件
    # -newer 参数
-   find . -type f -newer file.txt -print #找出比file.txt 修改时间更长的所有文件 
+   find . -type f -newer file.txt -print #找出比file.txt 修改时间更长的所有文件
    ```
 
 ## 将命令输出作为命令参数
@@ -80,6 +80,3 @@ cat -t table.log 				#查看制表符	说明：这个命令可以将连续的空
 ## 校验和与合适输入自动化
 
 ## 排序、单一与重复
-
-
-
