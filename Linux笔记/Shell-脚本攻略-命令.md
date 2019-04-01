@@ -73,7 +73,54 @@ cat -t table.log                    #查看制表符 说明：这个命令可以
    find . -type f -newer file.txt -print #找出比file.txt 修改时间更长的所有文件
    ```
 
-## 将命令输出作为命令参数
+4. 基于文件大小的搜索
+
+   ```shell
+   find -type f -size +2k		#查找大于2k的文件
+   ```
+
+5. 删除匹配的文件
+
+   ```shell
+   find . -type f -name "*.swp" -delete	#查找并删除
+   ```
+
+6. 基于文件权限和所有权的匹配
+
+   ```shell
+   find . -type f -perm 600 -print						#打印出权限为644的文件
+   find . -type f -name "*.php" ! -perm 644 -print		#查找合适的执行权限
+   ```
+
+7. 根据用户查找文件
+
+   ```shell
+   find ../home/ -type f -user slynux -print			#打印出用户slynux拥有的所有文件
+   ```
+
+8. 结合 find 执行命令或者动作
+
+   ```shell
+   find . -maxdepth 1 -perm 644 -name "test.log" -exec chown slynux:slynux {} \; #查找并修改权限 root用户
+   ```
+
+9. 查找并跳过特定的目录
+
+   ```shell
+   find . \( -name ".git" -prune \) -o \( -type of -print \) #打印出不含 .git 的文件路径
+   ```
+
+## xargs 将命令输出作为命令参数
+
+1. ![屏幕快照 2019-04-01 下午10.30.53](./image/屏幕快照 2019-04-01 下午10.30.53.png)
+
+2. 用自己的定界符来分隔参数
+
+   ```shell
+   echo "splitXsplitXsplit" | xargs -d X	#使用X为定界符
+   cat example.txt | xargs -i touch {}		#创建文件
+   cat example.txt | xargs -i rm {}		#删除匹配的文件
+   ```
 
 ## 用 tr 进行转换检查与词典操作
 
