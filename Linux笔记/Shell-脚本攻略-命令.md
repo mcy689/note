@@ -122,8 +122,34 @@ cat -t table.log                    #查看制表符 说明：这个命令可以
    cat example.txt | xargs -i rm {}		#删除匹配的文件
    ```
 
+3. Find 和 xargs 结合使用
+
+   ```shell
+   #find匹配并列出所有的.txt文件，并删除
+   	find . -type f -name "*.jpg" -print0 | xargs -0 rm -f
+   #统计php文件的行数
+    	find . -maxdepth 1 -type f -name "*.php" -print0 | xargs -0 wc -l
+   ```
+
 ## 用 tr 进行转换检查与词典操作
 
-## 校验和与合适输入自动化
+`tr` 只能通过 stdin（标准输入），而无法通过命令行参数来接受输入。 `tr [options] set1 set2` ,将来自stdin 的输入字符从 set1 映射到 set2，并将其输出写入 stdout（标准输出）。
 
-## 排序、单一与重复
+```shell
+#将输入字符由大写转换成小写
+	echo "HELLO WORLD" | tr 'A-Z' 'a-z'
+```
+
+## 校验
+
+```shell
+md5sum 1.log > zzz.md5		#生成md5加密检验和
+md5sum -c zzz.md5			#校验
+```
+
+## 排序(sort)、单一(uniq)与重复
+
+```shell
+grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /var/log/nginx/access.log |sort |uniq -c    #查看nginx访问IP数
+```
+
