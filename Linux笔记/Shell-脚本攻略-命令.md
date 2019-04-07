@@ -151,5 +151,32 @@ md5sum -c zzz.md5			#校验
 
 ```shell
 grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' /var/log/nginx/access.log |sort |uniq -c    #查看nginx访问IP数
+
+sort uniq.log | uniq -c #统计各行在文件中出现的次数
+sort uniq.log | uniq -d #找出文件中重复的行
+```
+
+## 临时文件名与随机数
+
+```shell
+dd if=/dev/zero bs=100k count=1 of=data.file #生成一个大小为100kb的测试文件
+```
+
+## 根据扩展名切分文件名
+
+```shell
+#获取文件名
+file_jpg="sample.jpg"
+name=${file_jpg%.*}
+echo $name //sample
+```
+
+##  交互输入
+
+```shell
+ #!/bin/bash
+  2 read -p "Enter number:" no;
+  3 read -p "Enter name:" name;
+  4 echo You have entered $no,$name;
 ```
 
