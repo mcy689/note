@@ -37,16 +37,16 @@
    Your branch is up-to-date with 'origin/master'.
    nothing to commit, working tree clean
    #所有已跟踪文件在上次提交后都未被更改过；当前目录下没有出现任何未跟踪的新文件。
-
+   
    $ git status
    On branch master
    Your branch is up-to-date with 'origin/master'.
    Untracked files:
      (use "git add <file>..." to include in what will be committed)
-
+   
            composer.lock
            readme1.md
-
+   
    nothing added to commit but untracked files present (use "git add" to track)
    #Untracked files 未跟踪的文件意味着GIt在之前的快照(提交)中没有这些文件;
    ```
@@ -133,13 +133,13 @@
 
 10. git commit
 
-    * 直接执行 `git commit`
+   * 直接执行 `git commit`
 
-      ![20180501234602](./img/20180501234602.png)
+     ![20180501234602](./img/20180501234602.png)
 
-      __标注的地方用来写说明__
+     __标注的地方用来写说明__
 
-    * git commit -m '2018-5-1 update' 可以使用 -m 参数后跟提交说明
+   * git commit -m '2018-5-1 update' 可以使用 -m 参数后跟提交说明
 
 11. 跳过使用暂存区域 `git commit -a ` 自动把所有__已经跟踪过的文件暂存起来一并提交__  
 
@@ -246,21 +246,21 @@
 
     10. 远程仓库的删除和重命名
 
-       * 重命名
+      * 重命名
 
-         ```shell
-         git remote rename origin paul
-         ```
+        ```shell
+        git remote rename origin paul
+        ```
 
-         __注意, 对远程仓库的重命名, 也会使对应的分支名称发生变化, 原来的origin/master 变成了 paul/mater__
+        __注意, 对远程仓库的重命名, 也会使对应的分支名称发生变化, 原来的origin/master 变成了 paul/mater__
 
-       * 删除
+      * 删除
 
-         ```shell
-         git remote rm paul
-         ```
+        ```shell
+        git remote rm paul
+        ```
 
-         __碰到远端参考服务器迁移, 或者原来的克隆镜像不再使用, 又或者某个参与者不再贡献代码, 那么需要移除对应的远端仓库__
+        __碰到远端参考服务器迁移, 或者原来的克隆镜像不再使用, 又或者某个参与者不再贡献代码, 那么需要移除对应的远端仓库__
 
     11. 打标签
 
@@ -301,4 +301,7 @@
         git push --all
         ```
 
-        ​
+13. git命令行没有颜色
+
+    `git config --global color.ui true`
+
