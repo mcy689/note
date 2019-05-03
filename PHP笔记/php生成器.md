@@ -40,28 +40,64 @@
    }
    ```
 
-
-    
-
 3. 如果在一个表达式上下文(例如在一个赋值表达式的右侧)中使用yield，你必须使用圆括号把yield申明包围起来。 例如这样是有效的：
 
    `$data = (yield $value);`
 
 4. 协程
 
-   * 协程的支持是在迭代生产器的基础上, 增加了可以回送数据给生成器的功能( 调用者发送数据给被调用的生成器函数. ) 
+   协程的支持是在迭代生产器的基础上, 增加了可以回送数据给生成器的功能( 调用者发送数据给被调用的生成器函数. ) 
 
-     ```php
-     function logger($filename) {
-         $filename = fopen($filename,'a');
-         while(true) {
-             fwrite($filename,yield."\n");
+   ```php
+   function logger($filename) {
+       $filename = fopen($filename,'a');
+       while(true) {
+           fwrite($filename,yield."\n");
+       }
+   }
+   $logger = logger(__DIR__.'/log');
+   $logger -> send('Foo');
+   $logger -> send('Bar');
+   //这里的yield能被演化成一个值, 这个值就是调用者传递给send()方法的值
+   ```
+
+5. 节省内存的示例。
+
+   ```php
+   //正常实现
+   function getValues() {
+      $valuesArray = [];
+      // 获取初始内存使用量
+      echo round(memory_get_usage() / 1024 / 1024, 2) . ' MB' . PHP_EOL;
+      for ($i = 1; $i < 800000; $i++) {
+         $valuesArray[] = $i;
+         // 为了让我们能进行分析，所以我们测量一下内存使用量
+         if (($i % 200000) == 0) {
+            // 来 MB 为单位获取内存使用量
+            echo round(memory_get_usage() / 1024 / 1024, 2) . ' MB'. PHP_EOL;
          }
-     }
-     $logger = logger(__DIR__.'/log');
-     $logger -> send('Foo');
-     $logger -> send('Bar');
-     //这里的yield能被演化成一个值, 这个值就是调用者传递给send()方法的值
-     ```
+      }
+      return $valuesArray;
+   }
+   $myValues = getValues(); // 一旦我们调用函数将会在这里创建数组
+   foreach ($myValues as $value) {}
+   
+   //yield 实现
+   function getValues() {
+      // 获取内存使用数据
+      echo round(memory_get_usage() / 1024 / 1024, 2) . ' MB' . PHP_EOL;
+      for ($i = 1; $i < 800000; $i++) {
+         yield $i;
+         // 做性能分析，因此可测量内存使用率
+         if (($i % 200000) == 0) {
+            // 内存使用以 MB 为单位
+            echo round(memory_get_usage() / 1024 / 1024, 2) . ' MB'. PHP_EOL;
+         }
+      }
+   }
+   $myValues = getValues(); // 在循环之前都不会有动作
+   foreach ($myValues as $value) {} // 开始生成数据
+   ```
 
-     ​
+   ![2019-05-03 11.00.10](./image/2019-05-03 11.00.10.png)
+
