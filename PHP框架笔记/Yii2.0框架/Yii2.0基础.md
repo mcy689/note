@@ -192,7 +192,5 @@ class AnimalController extends Controller
 }
 ```
 
-#### 事件的绑定和使用
 
-1. 
 
