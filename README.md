@@ -1,4 +1,3 @@
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 # Mynote
 自己技术成长的记录，点滴就是进步。每一次的进步我都欣喜若狂。
 
