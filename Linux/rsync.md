@@ -51,9 +51,3 @@ rsync [OPTION...] SRC... rsync://[USER@]HOST[:PORT]/DEST
    #远程不存在的文件，本地文件会被删除。
    ```
 
-## ssh登录
-
-```shel
-rsync -avz -e "ssh -p $port" /local/path/ user@remoteip:/path/to/files/
-```
-
