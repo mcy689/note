@@ -7,7 +7,9 @@
 3. 匹配模式可以以（`/`）结尾指定目录。
 4. 要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（`!`）取反。
 
-## 基础命令
+## 基础
+
+### 基础命令
 
 1. 查看当前状态
 
@@ -53,13 +55,13 @@
    git add file_to
    ```
 
-## 查看历史
+### 查看历史
 
 1. `git log` 					会按提交时间列出所有的更新。
 2. `git log -p -2`                           显示最近两次提交。
 3. `git log --grep kewWord`         查询指定关键字的提交。
 
-## 撤销操作 
+### 撤销操作 
 
 1. 提交完了才发现漏掉了几个文件没有添加，或者提交信息写错了。
 
@@ -79,7 +81,7 @@
    git checkout -- file_name
    ```
 
-## 远程仓库
+### 远程仓库
 
 1. 列出远程服务器的简写。
 
@@ -130,7 +132,15 @@
    git remote add origin git@bitbucket.org:machunyu/test.git
    # 4. 拉取本地远程代码
    git pull origin master
+   # 5. 设置本地 master 分支跟踪远程 master 分支，这样设置以后直接 git pull 就可以拉取代码
+   git branch --set-upstream-to=origin/remote_branch  your_branch
    ```
+
+### 打标签
+
+
+
+---
 
 ## 分支
 
