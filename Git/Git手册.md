@@ -1,6 +1,6 @@
 # 觉今是而昨非
 
-## `.gitignore` 的格式规范
+## `.gitignore` 格式规范
 
 1. 所有空行或者以 `＃` 开头的行都会被 Git 忽略。
 2. 匹配模式可以以（`/`）开头防止递归。
@@ -25,15 +25,15 @@
 3. 查看已暂存和未暂存的修改
 
    ```shell
-   git diff file 		未暂存的修改
-   git diff --cached 	已经暂存的修改
+   git diff file 		#未暂存的修改
+   git diff --cached 	#已经暂存的修改
    ```
 
 4. 提交更新
 
    ```shell
    git commit -m 'describe'
-   git commit -a -m 'describe' 跳过使用暂存区域
+   git commit -a -m 'describe' #跳过使用暂存区域
    ```
 
 5. 移除文件
@@ -41,6 +41,96 @@
    * `git rm filename` 从已跟踪文件清单中移除，并把工作目录中的文件也删除。
    * 如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 `-f`（译注：即 force 的首字母）。 这是一种安全特性，用于防止误删还没有添加到快照的数据，这样的数据不能被 Git 恢复。
    * `git rm --cached` 从暂存区域移除。
+
+6. 移动文件
+
+   ```shell
+   git mv file_from file_to
+   
+   #上述命令相当于
+   mv file_from file_to
+   git rm file_from
+   git add file_to
+   ```
+
+## 查看历史
+
+1. `git log` 					会按提交时间列出所有的更新。
+2. `git log -p -2`                           显示最近两次提交。
+3. `git log --grep kewWord`         查询指定关键字的提交。
+
+## 撤销操作 
+
+1. 提交完了才发现漏掉了几个文件没有添加，或者提交信息写错了。
+
+   ```shell
+   git commit -amend
+   ```
+
+2. 取消暂存文件。
+
+   ```shell
+   git reset HEAD file_name
+   ```
+
+3. 撤销对文件的修改。
+
+   ```shell
+   git checkout -- file_name
+   ```
+
+## 远程仓库
+
+1. 列出远程服务器的简写。
+
+   ```shell
+   git remote #origin 这是 Git 给你克隆的仓库服务器的默认名字：
+   ```
+
+2. 显示需要读写远程仓库使用的 Git 保存的简写与其对应的 URL。
+
+   ```shell
+   git remote -v
+   ```
+
+3. 添加远程仓库。（将本地仓库和远程仓库建立关联）
+
+   ```shell
+   #git remote add <shortname> <url> 添加一个新的远程 Git 仓库，同时指定一个你可以轻松引用的简写
+   ```
+
+4. 查看远程仓库。
+
+   ```shell
+   git remote show origin
+   ```
+
+5. 推送到远程服务器。
+
+   ```shell
+   git push origin master
+   ```
+
+6. 远程仓库的移除和重命名。
+
+   ```shell
+   git remote rename pb paul 	# 重命名
+   git remote rm paul			# 移除
+   ```
+
+7. 示例
+
+   ```shell
+   # 1. 创建本地目录
+   mkdir test
+   # 2. 初始化本地
+   git init
+   # 3. 添加远程仓库，即本地和远程建立关联
+   cd test
+   git remote add origin git@bitbucket.org:machunyu/test.git
+   # 4. 拉取本地远程代码
+   git pull origin master
+   ```
 
 ## 分支
 
@@ -136,3 +226,5 @@
    - 一种是`readme.txt`已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
    - 总之，就是让这个文件回到最近一次`git commit`或`git add`时的状态。
    - `git checkout -- file`命令中的`--`很重要，没有`--`，就变成了“切换到另一个分支”的命令，我们在后面的分支管理中会再次遇到`git checkout`命令。 
+
+5. 
