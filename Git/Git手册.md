@@ -136,7 +136,11 @@
    git branch --set-upstream-to=origin/remote_branch  your_branch
    ```
 
-### 打标签
+### 别名
+
+```shell
+git config --global alias.st status
+```
 
 
 
