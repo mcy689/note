@@ -319,3 +319,13 @@ git config --global alias.st status
    ```
 
 ## [配置 git](<https://git-scm.com/book/zh/v1/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-%E9%85%8D%E7%BD%AE-Git>)
+
+## [数据恢复](<https://git-scm.com/book/zh/v1/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E7%BB%B4%E6%8A%A4%E5%8F%8A%E6%95%B0%E6%8D%AE%E6%81%A2%E5%A4%8D>)
+
+## 其他命令
+
+1. 查看 git 使用的空间
+
+   ```shell
+   git count-objects -v
+   ```
