@@ -1,6 +1,6 @@
 # Git 手册
 
-## `.gitignore` 格式规范
+## `.gitignore` 格式
 
 1. 所有空行或者以 `＃` 开头的行都会被 Git 忽略。
 2. 匹配模式可以以（`/`）开头防止递归。
@@ -241,4 +241,6 @@ git config --global alias.st status
    - 总之，就是让这个文件回到最近一次`git commit`或`git add`时的状态。
    - `git checkout -- file`命令中的`--`很重要，没有`--`，就变成了“切换到另一个分支”的命令，我们在后面的分支管理中会再次遇到`git checkout`命令。 
 
-5. 
+
+## 服务器上的git
+
