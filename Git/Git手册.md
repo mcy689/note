@@ -60,6 +60,7 @@
 1. `git log` 					会按提交时间列出所有的更新。
 2. `git log -p -2`                           显示最近两次提交。
 3. `git log --grep kewWord`         查询指定关键字的提交。
+4. `git log -g`                                  输出格式的引用日志信息。
 
 ### 撤销操作 
 
@@ -242,5 +243,38 @@ git config --global alias.st status
    - `git checkout -- file`命令中的`--`很重要，没有`--`，就变成了“切换到另一个分支”的命令，我们在后面的分支管理中会再次遇到`git checkout`命令。 
 
 
-## 服务器上的git
+## git 工具
+
+### 储藏（Stashing）
+
+“‘储藏”“可以获取你工作目录的中间状态——**修改过的被追踪的文件**和**暂存的变更**——并将它保存到一个未完结变更的堆栈中，随时可以重新应用。
+
+1. 存储
+
+   ```shell
+   git stash
+   ```
+
+2. 查看现有的存储。
+
+   ```shell
+   git stash list
+   #stash@{0}: WIP on master: 330e68b test
+   ```
+
+3. 重新应用存储。**apply 选项只尝试应用储藏的工作——储藏的内容仍然在栈上。**
+
+   ```shell
+   git stash apply					#默认最新的一条
+   git stash apply stash@{0}		#任意存储
+   git stash pop 					#来重新应用储藏，并将储藏删掉
+   ```
+
+4. 删除存储。
+
+   ```shell
+   git stash drop
+   ```
+
+## [配置 git](<https://git-scm.com/book/zh/v1/%E8%87%AA%E5%AE%9A%E4%B9%89-Git-%E9%85%8D%E7%BD%AE-Git>)
 
