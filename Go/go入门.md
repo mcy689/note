@@ -1,5 +1,20 @@
 ## go 圣经
 
+## 数据类型
+
+```html
+bool
+rune
+int8 int16 int32 int64
+byte
+unint8 uint1 uint32 uint64
+float32 float64
+complex64 complex128
+string
+array slice
+map
+```
+
 ## 可见性规则
 
 Go 语言中，使用**大小写**来决定该常量、变量、类型、接口、结构或函数是否可以被外部包所调用。函数名首字母小写即为 private。函数名首字母大写即为 public。
