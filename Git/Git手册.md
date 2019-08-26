@@ -82,6 +82,12 @@
    git checkout -- file_name
    ```
 
+4. 撤销未提交的 `commit`。
+
+   ```shell
+   git reset HEAD^  #撤销最近一次的commit
+   ```
+
 ### 远程仓库
 
 1. 列出远程服务器的简写。
