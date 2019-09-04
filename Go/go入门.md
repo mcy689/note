@@ -1,5 +1,9 @@
 ## go 圣经
 
+## 函数
+
+
+
 ## channel
 
 1. Channel 是 goroutine 之间的通信机制。它可以让一个 goroutine 通过它给另一个grouting 发送信息。
@@ -42,3 +46,43 @@
    ```
 
 8. 因为关闭操作只用于断言不再向 channel 发送新的数据，所以只有在发送者所在的 goroutine 才会调用 close 函数，因此对一个只接收的 channel 调用 close 将是一个编译错误。
+
+### 缓存 channel
+
+1. 带缓存的 channel 内部持有一个元素队列。队列的最大容量是在调用 make 函数创建 channel 通过第二个参数指定的。
+
+   ```go
+   ch := make(chan string, 3)
+   ```
+
+2. 向缓存 channel 的发送操作就是向内部缓存队列的尾部插入元素，接收操作则是从队列的头部删除元素。如果内部缓存队列是满的，那么发送操作将阻塞直到因另一个 goroutine 执行接收操作而释放了新的队列空间。相反，如果 channel 是空的，接收操作将阻塞直到有另一个 goroutine 执行发送操作而向队列插入元素。
+
+3. Channel 的缓存队列解藕了接收和发送的 goroutine。
+
+4. 使用内置 `cap` 函数获取内部可以缓存的容量。使用内置的 `len` 函数，将返回内部缓存队列中有效元素的个数。
+
+   ```go
+   ch := make(chan string,3)
+   fmt.Println(cap(ch))		// 3
+   ch <- "A"
+   fmt.Println(len(ch)) 		// 1
+   ```
+
+5. 示例。
+
+   ```go
+   func mirroredQuery() string {
+   	responses := make(chan string,3)
+   	go func(){responses <- request("asia.gopl.io")}()
+   	go func(){responses <- request("asia.gopl.io")}()
+   	go func(){responses <- request("asia.gopl.io")}()
+   	return <- responses
+   }
+   func request( hostname string) string {
+   	return /*....*/
+   }
+   ```
+
+   该程序并发的向三个镜像站点发送请求，三个镜像站点分散在不同的地理位置。它们分别收到的响应发送到带缓存 channel 。最后接收者之接收到一个收到的响应。
+
+   如果使用了无缓存的 channel ，那么两个慢的 goroutine 将会因为没有人接收而被永远卡住。这种情况称为 goroutine 泄漏。
