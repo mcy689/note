@@ -2,7 +2,64 @@
 
 ## 函数
 
+1. 函数声明
 
+   ```go
+   func add(a int,b int) int{
+       return a + b
+   }
+   //等价
+   func add(a ,b int) int{
+       return a + b
+   }
+   ```
+
+2. 多返回值。
+
+   ```go
+   package main
+   import "fmt"
+   func swop(a int, b int) (int ,int) {
+   	return  b,a
+   }
+   func main(){
+   	fmt.Println(swop(1,2))
+   }
+   ```
+
+### 函数值
+
+1. 函数像其它值一样，拥有类型，可以被赋值给其他变量，传递个函数，从函数返回。对函数值的调用类似函数调用。
+
+   ```go
+   package main
+   import "fmt"
+   func add(a int, b int) int {
+   	return a + b
+   }
+   func main(){
+   	f := add
+   	fmt.Println(f(1,2));
+   }
+   ```
+
+2. 函数类型的零值是 nil。调用值为 nil的函数值会引起 panic 错误。
+
+   ```go
+   var f func(int) int
+   f(3) //此处f的值为nil，会引起panic错误。
+   ```
+
+3. 函数值可以与 nil 比较。
+
+   ```go
+   var f func(int) int
+   if f != nil{
+       f(3)
+   }
+   ```
+
+4. 函数值之间不可比较，也不能用函数值作为 map 的 key。
 
 ## channel
 
@@ -86,3 +143,83 @@
    该程序并发的向三个镜像站点发送请求，三个镜像站点分散在不同的地理位置。它们分别收到的响应发送到带缓存 channel 。最后接收者之接收到一个收到的响应。
 
    如果使用了无缓存的 channel ，那么两个慢的 goroutine 将会因为没有人接收而被永远卡住。这种情况称为 goroutine 泄漏。
+
+
+### select
+
+1. Go 的select语句是一种仅能用于channl发送和接收消息的专用语句。
+
+2. Go 的**channel 选择器** 让你可以同时等待多个通道操作。
+
+3. 这些 `case` 中的表达式都必须与 channel 的操作有关，也就是 Channel 的读写操作。
+
+   ```go
+   package main
+   
+   import "time"
+   import "fmt"
+   
+   func main() {
+       // 在我们的例子中，我们将从两个通道中选择。
+       c1 := make(chan string)
+       c2 := make(chan string)
+       
+       // 各个通道将在若干时间后接收一个值，这个用来模拟例如
+       // 并行的 Go 协程中阻塞的 RPC 操作
+       go func() {
+           time.Sleep(time.Second * 1)
+           c1 <- "one"
+       }()
+       go func() {
+           time.Sleep(time.Second * 2)
+           c2 <- "two"
+       }()
+   
+       // 我们使用 `select` 关键字来同时等待这两个值，并打
+       // 印各自接收到的值。
+       for i := 0; i < 2; i++ {
+           select {
+           case msg1 := <-c1:
+               fmt.Println("received", msg1)
+           case msg2 := <-c2:
+               fmt.Println("received", msg2)
+           }
+       }
+   }
+   ```
+
+## 基于共享变量的并发
+
+1. 一个函数在线性程序中可以正确地工作，如果在并发的情况下，这个函数依然可以正确地工作的话，那么这个函数是并发安全的。
+
+2. **数据竞争** 会在两个以上的 goroutine 并发访问相同的变量并且至少其中一个为写操作是发生。
+
+3. 不要使用共享数据来通信，使用通信来共享数据。
+
+4. 一个提供对一个指定的变量通过 channel 来请求的 goroutine 叫做这个变量的监控。
+
+   ```go
+   package main
+   
+   var deposits = make(chan int)
+   var balances = make(chan int)
+   
+   func Deposit(amount int){
+   	deposits <- amount
+   }
+   
+   func Balance()int{
+   	return <-balances
+   }
+   
+   func teller(){
+   	var balance int
+   	for{
+   		select {
+   		case amount := <- deposits:
+   			balance += amount
+   		case balances <- balance:
+   		}
+   	}
+   }
+   ```
