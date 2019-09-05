@@ -61,6 +61,60 @@
 
 4. 函数值之间不可比较，也不能用函数值作为 map 的 key。
 
+### 可变参数
+
+```go
+package  main
+import "fmt"
+func sum(vals ... int)int{
+	var total int;
+	for _,item := range vals{
+		total += item
+	}
+	return total
+}
+func main(){
+	fmt.Println(sum(1,2,3,4,4,5))
+    var ab = []int{1,3,3,4,5}
+	fmt.Println(sum(ab ...)) //原始参数已经是切片类型调用
+}
+```
+
+### deferred 函数
+
+1. 应该场景：defer语句经常被用于处理成对的操作，如打开、关闭、连接、断开连接、加锁、释放锁。通过defer机制，不论函数逻辑多复杂，都能保证在任何执行路径下，资源被释放。释放资源的defer应该直接跟在请求资源的语句后。
+
+2. 函数返回的过程：先给返回值赋值，然后调用defer 表达式。最后才是返回到调用函数中。
+
+   ```go
+   package  main
+   import "fmt"
+   func test() (result int){
+   	defer func(){
+   		result ++
+   	}()
+   	return 0
+   }
+   func test2() (r int) {
+        t := 5
+        defer func() {
+          t = t + 5
+        }()
+        return t
+   }
+   func test3() (r int) {
+       defer func(r int) {
+             r = r + 5
+       }(r)
+       return 1
+   }
+   func main(){
+   	fmt.Println(test()) //1
+       fmt.Println(test2()) //5
+       fmt.Println(test3()) //1
+   }
+   ```
+
 ## channel
 
 1. Channel 是 goroutine 之间的通信机制。它可以让一个 goroutine 通过它给另一个grouting 发送信息。
