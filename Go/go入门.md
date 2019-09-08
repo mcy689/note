@@ -115,6 +115,22 @@ func main(){
    }
    ```
 
+
+### 异常以及捕获
+
+```go
+package main
+import "fmt"
+func main(){
+	defer func(){
+		if p := recover(); p != nil {
+			fmt.Println(p)
+		}
+	}()
+	panic("test error")
+}
+```
+
 ## channel
 
 1. Channel 是 goroutine 之间的通信机制。它可以让一个 goroutine 通过它给另一个grouting 发送信息。
@@ -147,13 +163,13 @@ func main(){
    ch := make(chan int,3)  //buffered
    ```
 
-6. 一个基于无缓存 channel 的发送操作讲导致发送者 goroutine 阻塞，直到另一个goroutine 在相同的channeles 上执行接收操作，当发送的值通过 channels 成功传输之后，两个 goroutine 可以继续执行后面的语句。反之亦然。
+6. 一个基于无缓存 channel 的发送操作将导致发送者 goroutine 阻塞，直到另一个goroutine 在相同的channeles 上执行接收操作，当发送的值通过 channels 成功传输之后，两个 goroutine 可以继续执行后面的语句。反之亦然。
 
 7. 单方向的 channel，这种限制将在编译期检测。
 
    ```go
    func ping(chan <- string){}	//表示一个只发送的channel；
-   func pong(<- chan string){} //表示一个只发送的channel；
+   func pong(<- chan string){} //表示一个只接收的channel；
    ```
 
 8. 因为关闭操作只用于断言不再向 channel 发送新的数据，所以只有在发送者所在的 goroutine 才会调用 close 函数，因此对一个只接收的 channel 调用 close 将是一个编译错误。
@@ -277,3 +293,10 @@ func main(){
    	}
    }
    ```
+
+### gorutines 和线程
+
+#### 动态栈
+
+1. 每一个 os 线程都有一个固定大小的内存块（一般会是2mb）来做栈，这个栈会用来存储当前正在被调用或者挂起的函数的内部变量。
+
