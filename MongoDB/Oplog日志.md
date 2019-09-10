@@ -1,6 +1,6 @@
 ## Oplog 日志
 
-1. oplog（操作日志）是一个特殊的[固定集合](<https://docs.mongodb.com/manual/reference/glossary/#term-capped-collection>)，它保存了修改存储在数据库中的数据的所有操作的滚动记录。
+1. oplog（操作日志）是一个特殊的[固定集合](<https://docs.mongodb.com/manual/reference/glossary/#term-capped-collection>)，它保存了修改存储在数据库中数据的所有操作的滚动记录。
 2. MongoDB在[主要成员](https://docs.mongodb.com/manual/reference/glossary/#term-primary)上应用数据库操作，然后在主要成员的oplog上记录操作。然后，[辅助](https://docs.mongodb.com/manual/reference/glossary/#term-secondary)成员在异步过程中复制并应用这些操作。所有副本集成员都在集合中包含oplog的副本 [`local.oplog.rs`](https://docs.mongodb.com/manual/reference/local-database/#local.oplog.rs)，这允许它们维护数据库的当前状态。
 3. 为了便于复制，所有副本集成员都会向所有其他成员发送心跳（ping）。任何辅助成员都可以从任何其他成员导入 oplog 条目。
 4. oplog中的每个操作都是幂等的。也就是说，无论是对目标数据集应用一次还是多次，oplog操作都会产生相同的结果。
