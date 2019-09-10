@@ -20,3 +20,32 @@
 1. [`rs.printReplicationInfo()`](https://docs.mongodb.com/manual/reference/method/rs.printReplicationInfo/#rs.printReplicationInfo) 要查看oplog状态（包括操作的大小和时间范围）
 2. 使用 [`db.getReplicationInfo()`](https://docs.mongodb.com/manual/reference/method/db.getReplicationInfo/#db.getReplicationInfo)辅助成员和 [复制状态](https://docs.mongodb.com/manual/reference/method/db.getReplicationInfo/) 输出来评估当前的复制状态，并确定是否存在任何意外的复制延迟。
 
+## 副本集修改 Oplog
+
+1. 如果副本集执行身份验证，则必须以具有修改本地数据库权限的用户身份进行身份验证，例如`clusterManager` 或`clusterAdmin` 角色。
+
+2. 查看当前副本集的 oplog 大小
+
+   ```shell
+   #该maxSize字段显示集合大小（以字节为单位）。
+   use local
+   db.oplog.rs.stats().maxSize
+   ```
+
+3. 更改副本集成员的oplog的大小
+
+   ```shell
+   #将所需大小（以兆字节为单位）作为size参数传递。指定的大小必须大于990或等于990兆字节。
+   use local
+   db.adminCommand({replSetResizeOplog:1,size:1000})
+   ```
+
+4. 减小oplog的大小**不会** 自动回收分配给原始oplog大小的磁盘空间。
+
+   ```shell
+   use local
+   db.runCommand({"compact":"oplog.rs"})
+   ```
+
+   **对于集合中的 `compact` 命令需要的特殊权限，详细参看[官网文档](https://docs.mongodb.com/manual/reference/command/compact/#compact-authentication)**
+
