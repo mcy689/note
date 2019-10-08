@@ -24,7 +24,7 @@
    //结果输出
      /usr/local/apache2/htdocs/studyTP/function.php
      /usr/local/apache2/htdocs/studyTP/abc/config.php
-    ```
+   ```
 4. parse_ini_file() 函数的用法
    ```php
    //在.env中写入
@@ -109,19 +109,13 @@
     ```
   12. 获取代码运行的时间
         ```php
-        /**
-    	 * 计算代码的运行时间
-    	 * @return [type] [description]
-    	 */
-    	public function microtime_float()
-    	{
-    		list($usec, $sec) = explode(" ", microtime());
-    		return ((float) $usec + (float) $sec);
-    	}
+        public function microtime_float()
+        {
+            list($usec, $sec) = explode(" ", microtime());
+            return ((float) $usec + (float) $sec);
+        }
         $time_start= $this -> microtime_float();
-		//计算结束时间
-		$time_end = $this -> microtime_float();
-		$time = $time_end - $time_start;
-		
-       ```	
-  
+        //计算结束时间
+        $time_end = $this -> microtime_float();
+        $time = $time_end - $time_start;
+        ```
