@@ -1,11 +1,50 @@
 # C语言入门
 
+## 基础概念
+
+1. 预处理指令
+
+   ```c
+   #include <stdio.h>
+   /*
+   	符号#表示这是一个预处理指令,告诉编译器在编译源代码之前，要先执行一些操作。编译器在编译过程开始之前的预处理间断处理这些指令。
+   */
+   ```
+
+2. 预处理器
+
+   宏是提供给与处理器的指令，来添加或修改程序中的C语句。
+
+   ```c
+   #define INCHES_PER_FOOT 12
+   ```
+
+3. 输出格式
+
+   * `%d` 以十进制输出带符号整数
+   * `%f` 以小时形式输出单、双精度小数
+   * `%c` 输出单个字符。
+
+## 常用函数
+
+1. `sizeof` 运算符
+
+   * 使用 `sizeof` 运算符可以确定给定的类型占据多少字节。
+
+   * 表达式`sizeof(int)` 会得到 int 类型的变量所占据的字节数，所得的值是一个`size_t` 类型的整数。 
+   * `size_t` 类型在标准头文件 `<stdio.h>` （和其它头文件）中定义。
+
+   ```c
+   size_t size = sizeof(long long int)
+   ```
+
 ## 编程初步
 
 ### 计算机内存
 
 1. 计算机中的位以8个为一组，每组的8个位称为一个字节（byte）。
 2. 每个字节在内存里都有一个和其他字节不同的地址，字节的地址唯一地表示计算机内存中的字节。
+3. 1KB 是 1024 字节。
 
 ### 变量
 
@@ -33,7 +72,49 @@
 #define PI 3.141592f
 ```
 
+### 整数类型
+
+|          类型          | 字节数 |
+| :--------------------: | :----: |
+|      signed char       |   1    |
+|       short int        |   2    |
+|          int           |   4    |
+|        long int        |   4    |
+|     long long int      |   8    |
+|     unsigned char      |   1    |
+|   unsigned short int   |   2    |
+|      unsigned int      |   4    |
+|   unsigned long int    |   4    |
+| unsigned long long int |   8    |
+
+```c
+#在数值的后面加上一个大写L或小写l，表示long类型
+long Big_Number = 187600L;
+#将整数常量指定为long long 类型时，应添加两个L
+long long really_big_number = 123456789LL;
+#将常量指定为无符号类型时，应添加U
+unsigned int count = 1000U;
+unsigned long value = 9999999999UL;
+#最大范围的整数
+unsigned long long max = 946073047250800ULL
+```
+
+### 浮点数类型
+
+|   关键字    | 字节数 |     数值范围     |
+| :---------: | :----: | :--------------: |
+|    float    |   4    | 精确到6到7位小数 |
+|   double    |   8    |  精确到15位小数  |
+| long double |   12   |  精确到18位小数  |
+
 ## 字符串
+
+1. char 类型的变量有双重性，可以把它解释为一个字符，也可以解释为一个整数。
+
+   ```c
+   char letter = 'C'
+   letter = letter + 3;
+   ```
 
 ### 字符串常量
 
