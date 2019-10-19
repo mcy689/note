@@ -13,7 +13,7 @@
 
 2. 预处理器
 
-   宏是提供给与处理器的指令，来添加或修改程序中的C语句。
+   宏是提供给预处理器的指令，来添加或修改程序中的C语句。
 
    ```c
    #define INCHES_PER_FOOT 12
@@ -25,7 +25,7 @@
    * `%f` 以小时形式输出单、双精度小数
    * `%c` 输出单个字符。
 
-## 常用函数
+## 函数
 
 1. `sizeof` 运算符
 
@@ -36,6 +36,13 @@
 
    ```c
    size_t size = sizeof(long long int)
+   ```
+
+2. `scanf(要读入的数格式，变量地址)` 
+
+   ```c
+   int a;
+   scanf("%d",&a) //读入一个十进位的整数。
    ```
 
 ## 编程初步
@@ -74,6 +81,12 @@
 
 ### 整数类型
 
+- 一个位（bit）可以存储一个0或者1。
+- 一个字节（位元组）通常可以存储8个位。
+- 一个字节可以存储256中不同的组合
+  1. 从 0 开始 255 （无符号）
+  2. 从-128 到 127 （有符号）
+
 |          类型          | 字节数 |
 | :--------------------: | :----: |
 |      signed char       |   1    |
@@ -107,7 +120,20 @@ unsigned long long max = 946073047250800ULL
 |   double    |   8    |  精确到15位小数  |
 | long double |   12   |  精确到18位小数  |
 
+```c
+int main()
+{
+	float a = 123.45;
+	double b = 123.45;
+	printf("%f\n",a); //123.449997
+	printf("%f\n",b); //123.450000
+	return 0;
+}
+```
+
 ## 字符串
+
+### 字元
 
 1. char 类型的变量有双重性，可以把它解释为一个字符，也可以解释为一个整数。
 
@@ -116,9 +142,22 @@ unsigned long long max = 946073047250800ULL
    letter = letter + 3;
    ```
 
-### 字符串常量
+2. 大小写转换
 
-1. 字符串常量是放在一对双引号中的一串字符或者符号。
+   ```c
+   int main()
+   {
+   	char input,output;
+   	scanf("%c",&input);
+   	output = input + 32;
+   	printf("%c\n",output);
+   	return 0;
+   }
+   ```
+
+### 字符串
+
+1. 字符串是放在一对双引号中的一串字符或者符号。
 
 2. 内存中字符串的例子
 
@@ -126,18 +165,111 @@ unsigned long long max = 946073047250800ULL
 
 3. 字符串的结尾 `\0`
 
-### 存储字符串的变量
+```c
+//1.方法一
+//这个变量最多存储19个字符的字符串，因为必须给终止符号提供一个数组元素。
+	char saying[20];
+//2.方法二
+//编译器会指定一个足够容纳这个初始化字符串常量的数值。
+	char saying[] = "This is a string";
+```
 
-1. 声明
+### 枚举
 
-   ```c
-   1.方法一
-   	//这个变量最多存储19个字符的字符串，因为必须给终止符号提供一个数组元素。
-   	char saying[20];
-   2.方法二
-   	//编译器会指定一个足够容纳这个初始化字符串常量的数值。
-   	char saying[] = "This is a string";
-   ```
+```c
+enum Weekday {Monday,Tuesday,Wednesday}
+```
+
+## 条件判断
+
+### if
+
+```c
+#include <stdio.h>
+#include <stdbool.h>
+
+int main()
+{
+    bool res = true;
+    if(res)
+        printf("%c",'A');
+    else
+        printf("%c",'B');
+
+    return 0;
+}
+```
+
+### 按位运算符
+
+| 运算符 |      说明      |
+| :----: | :------------: |
+|  `&`   |  按位与运算符  |
+|  `|`   |  按位或运算符  |
+|  `^`   | 按位异或运算符 |
+|  `~`   |  按位非运算符  |
+|  `<<`  | 按位左移运算符 |
+|  `>>`  | 按位右移运算符 |
+
+```c
+#include <stdio.h>
+
+int main()
+{
+    int x = 0;
+    int y = 1;
+    printf("%d \n",x&y); //0
+    printf("%d \n",x|y); //1
+    int d = 3; //011
+    int c = 4; //100
+    printf("%d \n",d^c); //111 --> 整数的 7
+    return 0;
+}
+```
+
+### switch
+
+```c
+#include <stdio.h>
+int main()
+{
+	int num1,num2;
+	char op;
+	float anawer;
+	scanf("%d%c%d",&num1,&op,&num2);
+	switch(op){
+		case '+': anawer = num1 + num2; break;
+		case '-': anawer = num1 - num2; break;
+		case '*': anawer = num1 * num2; break;
+		case '/': anawer = (float)num1 / num2; break;
+	}
+	printf("ans %.2f\n",anawer);
+	return 0;
+}
+```
+
+### do -- while
+
+```C
+int main()
+{
+	int total;
+	int id;
+	do{
+		scanf("%d",&id);
+		switch(id){
+			case 1 : total += 90; break;
+			case 2 : total += 75; break;
+			case 3 : total += 83; break;
+			case 4 : total += 89; break;
+			case 5 : total += 71; break;
+		}
+	} while(id != 0);
+	printf("Total:%d\n",total);
+	return 0;
+}
+```
+
 
 
 ## 指针
