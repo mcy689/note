@@ -24,6 +24,9 @@
    * `%d` 以十进制输出带符号整数
    * `%f` 以小时形式输出单、双精度小数
    * `%c` 输出单个字符。
+   * `%s` 字符串。
+   * `%p` 输出变量的地址。
+   * `%u` 以十进制形式输出无符号整数
 
 ## 函数
 
@@ -163,7 +166,7 @@ int main()
 
    ![201812121150](./img/201812121150.png)
 
-3. 字符串的结尾 `\0`
+3. 字符串的结尾 `\0`，也叫空字符。
 
 ```c
 //1.方法一
@@ -173,6 +176,22 @@ int main()
 //编译器会指定一个足够容纳这个初始化字符串常量的数值。
 	char saying[] = "This is a string";
 ```
+
+4. 字符串长度
+
+   ```c
+   #include <stdio.h>
+   int main()
+   {
+       char str1[] = "To be or not to be";
+       unsigned int count = 0;
+       while (str1[count] != '\0'){
+           ++count;
+       }
+       printf("The length of the string %d\n",count);
+       return 0;
+   }
+   ```
 
 ### 枚举
 
@@ -187,7 +206,6 @@ enum Weekday {Monday,Tuesday,Wednesday}
 ```c
 #include <stdio.h>
 #include <stdbool.h>
-
 int main()
 {
     bool res = true;
@@ -202,18 +220,17 @@ int main()
 
 ### 按位运算符
 
-| 运算符 |      说明      |
-| :----: | :------------: |
-|  `&`   |  按位与运算符  |
-|  `|`   |  按位或运算符  |
-|  `^`   | 按位异或运算符 |
-|  `~`   |  按位非运算符  |
-|  `<<`  | 按位左移运算符 |
-|  `>>`  | 按位右移运算符 |
+| 运算符 |         说明         |
+| :----: | :------------------: |
+|  `&`   |     按位与运算符     |
+|  `|`   |     按位或运算符     |
+|  `^`   |    按位异或运算符    |
+|  `~`   | 按位非运算符（补码） |
+|  `<<`  |    按位左移运算符    |
+|  `>>`  |    按位右移运算符    |
 
 ```c
 #include <stdio.h>
-
 int main()
 {
     int x = 0;
@@ -226,6 +243,12 @@ int main()
     return 0;
 }
 ```
+
+## 循环
+
+### for
+
+### while
 
 ### switch
 
@@ -270,14 +293,113 @@ int main()
 }
 ```
 
+## 数组
 
+数组是一组数目固定、类型相同的数据项，数组中的数据项称为元素。
+
+### 初始化
+
+```c
+#初始化整个数组，使得每个元素都有一个值
+int counter[6] = {1,2,3,4,5,6};
+#初值的个数少于元素数，没有初值的元素就设成0
+int counter[6] = {9};
+int counter[] = {1,2,3,4,5,6};
+```
+
+### 数组大小
+
+```c
+//sizeof
+#include <stdio.h>
+int main()
+{
+    int values[5] = {1,2,3,4};
+   printf("%zd\n",sizeof(values)/sizeof(values[0]));
+    return 0;
+}
+//用特定保留值表示数组长度
+#include<stdio.h>
+int length(int[]);
+int main()
+{
+	int v[4] = {1,2,3,-1};
+	printf("%d\n",length(v));
+	return 0;
+}
+int length(int v[])
+{
+	int i = 0;
+	while(v[i] != -1){
+		i++;
+	}
+	return i;
+}
+```
+
+### 多维数组
+
+```c
+//二维数组
+int v[2][3] = {{1,2,3},{4,5,6}};
+```
+
+### 数组排序
+
+```c
+#include <stdio.h>
+int main()
+{
+	int v[5],i,j;
+	for(i=0;i<5;i++){
+		scanf("%d",&v[i]);
+	}
+	for(i=0;i<4;i++){
+		for(j=0;j<4-i;j++){
+			if(v[j] > v[j+1]){
+				int t = v[j+1];
+				v[j+1] = v[j];
+				v[j] = t;
+			}
+		}
+	}
+	for(i=0;i<5;i++){
+		printf("%d",v[i]);
+	}
+	return 0;
+}
+```
+
+### 数组复制
+
+```c
+#include<stdio.h>
+void increase(int[3]);
+int main()
+{
+	int i,n[3] = {1,2,3};
+	increase(n);
+	for(i=0;i<3;i++){
+		printf("n[%d] = %d \n",i,n[i]);
+	}
+	return 0;
+}
+//这里是传的引用。
+void increase(int n[3]){
+	int i;
+	for (i=0; i < 3; i++)
+	{
+		n[i]++;
+	}
+}
+```
 
 ## 指针
 
 ### 基本概念
 
 1. 存储地址的变量称为指针。
-2. 类型名 void* 表示没有指定类型，所以 void* 类型的指针可以包含任意类型的数据项地址。类型 void* 常常用做参数类型，或以独立于类型的方式处理数据的函数的返回值类型。
+2. 类型名 void* 表示没有指定类型，所以 void* 类型的指针可以包含任意类型的数据项地址。类型 void* 常常用做参数类型，或以独立于类型的方式处理数据的函数的返回值类型，在使用它时，再将其转换为合适的类型。
 
 ### 声明指针
 
