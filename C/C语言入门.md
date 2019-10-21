@@ -481,7 +481,7 @@ void increase(int n[3]){
 
 2. NULL 
 
-   是在标准库中定义的一个常量，对于指针它表示0。NULL 是一个不指向任何内存位置的值。这表示，使用不指向任何对象的指针，不会意外覆盖内存。
+   是在标准库中定义的一个常量，对于指针它表示0。NULL 是一个不指向任何内存位置的值。这表示，使用不指向任何对象的指针，不会意外覆盖内存。当编译器不能识别NUll，就应该在源文件中包含`<stddef.h>` 头文件。
 
 3. 用已声明的变量地址初始化子针变量
 
@@ -495,6 +495,25 @@ void increase(int n[3]){
    ```c
    double value,*pVal=NULL;
    ```
+
+5. `void*` 类型的指针可以包含任意类型的数据项地址。类型 `void*` 常常用做参数类型，或以独立于类型的方式处理数据的函数的返回值类型。
+
+```c
+#include <stdio.h>
+int main(void)
+{
+    int number = 0;
+    int *pNumber = NULL;
+    number = 10;
+    printf("%p\n",&number);
+    printf("%d\n",number);
+    pNumber = &number;
+    printf("%p\n",pNumber);
+    printf("%d\n",*pNumber);
+    printf("%zd\n",sizeof(pNumber));
+    return 0;
+}
+```
 
 ### 使用指针
 
