@@ -28,6 +28,8 @@
    * `%p` 输出变量的地址。
    * `%u` 以十进制形式输出无符号整数
 
+4. **内存泄漏** 当动态分配了一些内存时，没有保留对它们的引用，就会出现内存泄漏，此时无法释放内存。
+
 ## 函数
 
 1. `sizeof` 运算符
@@ -731,6 +733,7 @@ int main()
 {
     int *p = NULL;
     p = (int *)malloc(sizeof(int)*10);
+    //因为某种原因而不能分配请求的内存，malloc()会返回一个NULL指针。
     if(p == NULL){
         printf("Cant get memory! \n");
     }
@@ -748,14 +751,68 @@ int main()
 要释放动态分配的内存，必须能访问引用内存快的地址。
 
 ```c
-//要释放动态分配的内存，而该内存的地址存储在 pNumber 指针中。
+//只要 pNumber 包含分配内存时返回的地址，就会释放所分配的整个内存块，以备以后使用。在指针指向的内存释放后，应总时是指针设置为NULL。
 free(pNumber);
 pNumber = NULL;
 ```
 
+### 示例
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+int main(void)
+{
+    //如果一个数不是质数，它必定能被比它小的质数整除。需要按照顺序查找质数，所以可以把已经找到的质数作为除数，确定所检查的数是否为质数。
+    unsigned long long *pPrimes = NULL;
+    unsigned long long trial = 0;
+    bool found = false;
+    int total = 0;
+    int count = 0;
+    printf("How many 4 ?");
+    scanf("%d",&total);
+    total = total < 4 ? 4 : total;
+    pPrimes = (unsigned long long*)malloc(total*sizeof(unsigned long long));
+    if(pPrimes == NULL){
+        printf("Not enough memory. It is the end Im afraid.\n");
+        return 1;
+    }
+
+    *pPrimes = 2ULL;
+    *(pPrimes+1) = 3ULL;
+    *(pPrimes+2) = 5ULL;
+    count = 3;
+    trial = 5ULL;
+    while(count < total)
+    {
+        trial += 2UL;
+        for(int i = 1; i < count; ++i){
+           //bool 类型，非0值转换为true；0值转换为false
+            if(!(found = (trial % *(pPrimes+i)))){
+                break;
+            }
+        }
+        if(found){
+            *(pPrimes + count++) = trial;
+        }
+    }
+    for(int i = 0;i < total; ++i){
+        printf("%12llu",*(pPrimes + i));
+        if(!((i+1)%5)){
+            printf("\n");
+        }
+    }
+    printf("\n");
+    free(pPrimes);
+    pPrimes = NULL;
+    return 0;
+}
+```
+
 ### 用 calloc() 函数分配内存
 
-1. 它给内存分配为给定大小的数组，
+1. 它给内存分配为给定大小的数组
 
 2. 它初始化了所分配的内存，所有的位都是0。
 
