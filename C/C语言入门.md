@@ -1105,9 +1105,65 @@ int difference(int x,int y)
    }
    ```
 
-## 基本输入和输出操作
+## 结构化数据
 
-### 输入和输出流
+### 使用 struct
 
-1. c 语言中的每个输入源和输出目的地都称为**流**。
+1. 声明
 
+   ```c
+   struct Horse
+   {
+       int age;
+       int height;
+       char name[20];
+       char father[20];
+       char mother[20];
+   } dobbin = {24,17,"Dobbin","Trigger","Flossie"};
+   ```
+
+2. 定义存储结构的新变量时，需要 `struct` 关键字，使用 `typedef` 定义，声明变量时就可以删除 `struct` 关键字。
+
+   ```c
+   #include <stdio.h>
+   int main()
+   {
+       struct Horse
+       {
+           int age;
+           int height;
+           char name[20];
+           char father[20];
+           char mother[20];
+       } dobbin = {24,17,"Dobbin","Trigger","Flossie"};
+       printf("%zd\n",sizeof(struct Horse));
+       typedef struct Horse Horse;
+       printf("%zd\n",sizeof(Horse));
+       return 0;
+   }
+   ```
+
+3. 访问结构成员。
+
+   ```c
+   //修改
+   dobbin.age = 12;
+   //特定结构的地址值可以这样访问
+   printf("%s\n",(&dobbin)->name);
+   ```
+
+4. 结构指针。
+
+   ```c
+   Horse *phorse = NULL;
+   //在没有 typedef 定义的情况下
+   struct Horse *phorse = NULL;
+   ```
+
+### 将一个结构作为另一个结构的成员。
+
+1. 定义
+
+   ```c
+   
+   ```
