@@ -50,6 +50,7 @@
    scanf("%d",&a) //读入一个十进位的整数。
    ```
 
+
 ## 变量的可视范围
 
 1. __局部变量__ ：属于某个{}，在{}外部不能使用此变量，在{}内部是可以使用。执行到普通局部变量定义语句，才会分配空间，离开{}，自动释放。普通局部变量不初始化，默认值为随机数。
@@ -1068,8 +1069,45 @@ int difference(int x,int y)
    }
    ```
 
-3. 变量个数可变的函数。
+3. 变量个数可变的函数。`标准库<stdarg.h>` 
 
    ```c
+   //长度可变的变量列表的基本规则
+   //	在变量数目可变的函数中，至少要有一个固定变量。
+   //	必须调用 va_start() 初始化函数中可变变量列表指针的值。变量指针类型必须声明为 va_list 类型。
+   //	必须有确定何时终止变量列表的方法。例如，在可变的变量列表中，最后一个变量有固定的值，可以检测它，因为它不同于其它变量的值。
+   
+   #include <stdio.h>
+   #include <stdarg.h>
+   
    double average(double v1, double v2, ...);
+   int main()
+   {
+       double result = average(1.2,1.2,1.2,1.2,1.2,1.8,0.6,0.0);
+       printf("%.2lf\n",result);
+       return 0;
+   }
+   double average(double v1,double v2, ...){
+       va_list parg;
+       double sum = v1 + v2;
+       double value = 0.0;
+       int count = 2;
+       //void va_start(va_list parg,last_fixed_arg);
+       va_start(parg,v2);
+   	// va_arg() 函数会返回parg 指定的当前变量值，并将它存储到value中，同时会更新 parg 指针。
+       while((value = va_arg(parg,double)) != 0.0){
+           sum += value;
+           ++count;
+       }
+       //将 parg 重置为指向NULL，
+       va_end(parg);
+       return sum/count;
+   }
    ```
+
+## 基本输入和输出操作
+
+### 输入和输出流
+
+1. c 语言中的每个输入源和输出目的地都称为**流**。
+
