@@ -551,24 +551,19 @@ int main(void)
 
 ### 指向常量的指针
 
-1. 声明指针时，可以使用 const 关键字指定，该指针指向的值不能改变。
+声明指针时，可以使用 const 关键字指定，该指针指向的值不能改变。
 
-   ```c
-   long value = 9999L;
-   const long *pvalue = &value;
-   ```
-
-2. 把 pvalue 指向的值声明为 const。所以编译器回检查是否有语句试图修改 pvalue 指向的值，并将这些语句标记为错误。
-
-   ```c
-   *pvalue = 888L;
-   ```
-
-3. pvalue 指向的值不能改变，但可以对 value 进行任意操作
-
-   ```c
-   value = 777L;
-   ```
+```c
+int value = 9999;
+const int *pvalue = &value;
+//pvalue 指向的值不能改变
+//*pvalue = 888L;
+//可以对 value 进行任意操作
+value  = 777L;
+//如下是可以的。
+int val = 888;
+pvalue = &val;
+```
 
 ### 常量指针
 
@@ -918,9 +913,10 @@ bool sendMessage(count char* pmessage)
 2. 声明函数指针
 
    ```c
-   //这个指针的名称是 pfunction，指向一个参数是 int 类型、返回值是int类型的函数。
    int (*pfunction) (int)
    ```
+
+   ![ 20191023101928](./img/ 20191023101928.png)
 
 ### 通过函数指针调用函数
 
@@ -1053,5 +1049,27 @@ int difference(int x,int y)
 }
 ```
 
-### 静态变量：函数内部的追踪
+### 函数中的变量
 
+1. 静态变量。
+
+   ```c
+   static int count = 0;
+   ```
+
+2. 在函数之间共享变量。
+
+   ```c
+   #include <stdio.h>
+   int count =0;
+   int main()
+   {
+       return 0;
+   }
+   ```
+
+3. 变量个数可变的函数。
+
+   ```c
+   double average(double v1, double v2, ...);
+   ```
