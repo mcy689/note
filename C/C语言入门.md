@@ -1160,7 +1160,22 @@ int difference(int x,int y)
    struct Horse *phorse = NULL;
    ```
 
-### 二叉树
+### 共享内存
+
+1. 在`C` 语言中允许在多个不同变量共享同一内存区的功能称为联合(union)，声明联合。
+
+   ```c
+   union U_example
+   {
+   	float decval;
+   	int *pnum;
+   	double my_value;
+   } u1;
+   ```
+
+2. 联合实例所占的字节数时其最大的成员所占的空间。
+
+## 处理文件
 
 
 
