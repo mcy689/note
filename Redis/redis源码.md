@@ -19,7 +19,7 @@ struct sdshdr
 };
 ```
 
-###sdshdr 大小
+### sdshdr 大小
 
 ```c
 sizeof(struct sdshdr); //8 sizeof(int) + sizeof(int) + 0
@@ -28,7 +28,7 @@ sizeof(struct sdshdr); //8 sizeof(int) + sizeof(int) + 0
 1. 在gcc中，当我们创建长度为零的数组时，它被视为不完整类型的数组，这就是gcc将其大小报告为“ 0”字节的原因。该技术被称为**Stuct Hack**。
 2. 当在结构内部创建零长度的数组时，它必须是（并且仅是）结构的最后一个成员。
 
-###sds 和 sdshdr 相互转化
+### sds 和 sdshdr 相互转化
 
 1. sds 到 sdshdr 转化
 
@@ -47,4 +47,18 @@ sizeof(struct sdshdr); //8 sizeof(int) + sizeof(int) + 0
        return sh->len;
    }
    ```
+
+### 惰性空间释放
+
+```c
+void sdsclear(sds s) {
+    // 取出 sdshdr
+    struct sdshdr *sh = (void*) (s-(sizeof(struct sdshdr)));
+    // 重新计算属性
+    sh->free += sh->len;
+    sh->len = 0;
+    // 将结束符放到最前面（相当于惰性地删除 buf 中的内容）
+    sh->buf[0] = '\0';
+}
+```
 
