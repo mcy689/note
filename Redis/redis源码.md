@@ -15,7 +15,7 @@ struct sdshdr
     //buf 中剩余可用的长度
     int free;
     //字符串实际保存空间
-    int buf[];
+    char buf[];
 };
 ```
 
