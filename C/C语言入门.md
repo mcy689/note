@@ -856,28 +856,126 @@ void add_element(char c)
 
 ## 预处理指令
 
-```c
-#include <stdio.h>
-#if __WIN32
-#include <windows.h>
-#elif __linux__
-#include <unistd.h>
-#endif
+1. 不管是标准头文件，还是自定义头文件，都只能包含变量和函数的声明，不能包含定义，否则在多次引入时会引起重复定义错误。
 
-int main()
-{
-    #if __WIN32
-    Sleep(5000);
-    #elif __linux__
-    sleep(5000);
-    #endif
+### `#define`
 
-    puts("test-bb");
-    return 0;
-}
-```
+1. 在预处理阶段，对程序中所有出现的"宏名"，预处理器都会用宏定义中的字符串去代换。
 
+   ```c
+   #include <stdio.h>
+   #define N 100
+   
+   int main()
+   {
+       int sum = 20 + N;
+       printf("%d\n",sum);
+       return 0;
+   }
+   ```
 
+2. 宏定义是用宏名来表示一个字符串，在宏展开时又以该字符串取代宏名，这只是一种简单粗暴的替换。字符串中可以含任何字符，它可以是常数、表达式、if语句、函数。预处理程序对它不作任何检查，如有错误，只能在编译已被宏展开后的源程序时发现。
+
+3. 宏定义不是说明或语句，在行末不必加分号，如加上分号则连分号也一起替换。
+
+4. 宏定义必须写在函数之外，其作用域为宏定义命令起到源程序结束。如果要终止其作用域可使用 `#undef` 命令。
+
+   ```c
+   #define PI 3.14159
+   int main(){
+       return 0;
+   }
+   #undef PI
+   void func(){
+       
+   }
+   ```
+
+5. 宏定义允许嵌套，在宏定义的字符串中可以使用已经定义的宏名，在宏展开时由预处理程序层层代换。
+
+   ```c
+   #define PI 3.1415926
+   #define S PI*y*y
+   ```
+
+### 预定义宏
+
+1. `__DATE__` 表示当前源代码的行号；
+
+2. `__TIME__` 表示当前源文件的名称；
+
+3. `__FILE__` 表示当前的编译日期；
+
+4. `__LINE__` 表示当前的编译时间；
+
+   ```c
+   #include <stdio.h>
+   #include <stdlib.h>
+   
+   int main()
+   {
+       printf("Date : %s\n", __DATE__);
+       printf("Time : %s\n", __TIME__);
+       printf("File : %s\n", __FILE__);
+       printf("Line : %d\n", __LINE__);
+       return 0;
+   }
+   ```
+
+### c 语言条件编译
+
+能够根据不同情况编译不同代码、产生不同目标文件的机制，称为条件编译。
+
+1. `#if`，`#elif`，`else` ，`endif` 
+
+   ```c
+   #if
+   #elif
+   #else
+   #endif
+   ```
+
+2. `#ifdef` 用法。
+
+   ```c
+   #ifdef 宏名 //如果当前的宏已被定义过
+    //code 1
+   #else
+    //code 2
+   #endif
+   
+   #ifndef 宏名 //如果当前宏未被定义
+   #else
+   #endif
+   ```
+
+3. 区别，`#if` 后面跟的是"整数常量表达式"，而`#ifdef` 和 `#ifndef` 后面跟的只能是一个宏名。
+
+   ```c
+   #include <stdio.h>
+   #define NUM 10
+   int main(){
+       #if NUM == 10 || NUM == 20
+       	printf("NUM: %d\n", NUM);
+       #else
+       	printf("NUM Error\n");
+       #endif
+       return 0;
+   }
+   ```
+
+4. `#error` 指令用于在编译期间产生错误信息，并阻止程序的编译。
+
+   ```c
+   #error error_message
+   ```
+
+   ```c
+   //程序针对Linux 编写，不保证兼容 windows。
+   #ifdef WIN32
+   #error This programme cannot compile at Windows Platform
+   #endif
+   ```
 
 ## 程序的结构
 
