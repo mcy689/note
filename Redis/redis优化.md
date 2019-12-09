@@ -53,3 +53,26 @@ active-defrag-cycle-min 25
 active-defrag-cycle-max 75
 ```
 
+## 开启慢查询日志
+
+### 配置项
+
+1. `slowlog-log-slower-than` 选项指定执行时间超过多少微秒（1 秒等于 1,000,000 微秒）的命令请求会被记录到日志上。举个例子， 如果这个选项的值为 100 ， 那么执行时间超过 100 微秒的命令就会被记录到慢查询日志； 如果这个选项的值为 500 ， 那么执行时间超过 500 微秒的命令就会被记录到慢查询日志。
+
+2. `slowlog-max-len` 选项指定服务器最多保存多少条慢查询日志。
+
+   ```redis
+   config get slowlog-log-slower-than
+   config get slowlog-max-len
+   ```
+
+### 客户端查看慢查询日志
+
+```redis
+slowlog get 	#获取慢查询日志
+slowlog len 	#获取慢查询日志条数
+slowlog reset 	#清空慢查询	
+```
+
+![截屏2019-12-09下午11.48.36](./image/截屏2019-12-09下午11.48.36.png)
+
