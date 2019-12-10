@@ -40,14 +40,14 @@
 <details>
 <summary><b>目录</b></summary>
 
-* [字符串](传说部分/人物传说/赵武灵王.md)
-* [哈希表](传说部分/人物传说/刘秀封树.md)
-* [列表](传说部分/人物传说/李存孝的传说故事.md)
-* [有序集合](传说部分/人物传说/李存孝传说四则.md)
-* [HyperLogLog](传说部分/人物传说/李存孝和“嗡嗡石”.md)
-* [Stream](传说部分/人物传说/李存孝和“嗡嗡石”.md)
-* [持久化](传说部分/人物传说/李存孝的脚印.md)
-* [复制](传说部分/人物传说/李存孝的脚印.md)
-* [配置选项](传说部分/人物传说/李存孝的脚印.md)
+* [字符串](Redis/基础.md)
+* [哈希表](Redis/基础.md)
+* [列表](Redis/基础.md)
+* [有序集合](Redis/基础.md)
+* [HyperLogLog](Redis/HyperLogLog.md)
+* [Stream](Redis/Stream.md)
+* [持久化](Redis/持久化.md)
+* [复制](Redis/复制.md)
+* [优化](Redis/优化.md)
 </details>
 
