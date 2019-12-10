@@ -338,8 +338,22 @@ var_dump($res->acquire_semaphore('testffff',5,10));
 ### 延时任务
 
 1. 在任务信息中包含任务的执行时间，如果工作进程发现任务的执行时间尚未来临，那么它将在短暂等待之后，吧任务重新推入队列里面。
+
 2. 工作进程使用一个本地的等待列表来记录所有需要在未来执行的任务，并在每次进行 while 循环的时候，检查等待列表并执行那些已经到期的任务。
+
 3. 把所有需要在未来执行的任务都添加到有序集合里面。并将任务的执行时间设置为分值，另外再使用一个进程来查找有序集合里面是否存在可以立即被执行的任务，如果有的话，就从有序集合里面移除那个任务，并将它添加到适当的任务队列里面。
 
-
+   ```php
+   $scriptLua = <<<LUA
+           local tabSoreSet = {};
+           tabSoreSet = redis.pcall('ZRANGEBYSCORE',KEYS[1],KEYS[2],KEYS[3],'limit',0,1);
+           if (next(tabSoreSet) == nil) then
+               return false;
+           end;
+           local member = tabSoreSet[1];
+           redis.pcall('zrem',KEYS[1],member);
+           return member;
+   LUA
+   $redis->eval($scriptLua,array('rediskey',0,$nowTime),3);
+   ```
 

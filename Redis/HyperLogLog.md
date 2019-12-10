@@ -33,5 +33,27 @@
    (integer) 5
    ```
 
+## 布隆过滤器
 
+1. 插件地址：`https://github.com/RedisLabsModules/rebloom#building-and-loading-rebloom`
+
+2. 当布隆过滤器说某个值存在时，这个值可能不存在；当它说不存在时，那就肯定不存在。
+
+3. [命令](https://github.com/RedisLabsModules/rebloom/blob/master/docs/Bloom_Commands.md)
+
+   ```html
+   添加
+   bf.add codehole user1
+   判断是否存在
+   bf.exists codehole user1
+   批量添加
+   bf.madd codehole user2 user3
+   批量判断是否存在
+   bf.mexists codehole user1 user2
+   ```
+
+4. 应用场景
+
+   - 在爬虫系统中，我们需要对 URL 进行去重，已经爬过的网页就可以不用爬了。
+   - 布隆过滤器可以显著的降低数据库的 IO 请求数量。当用户来查询某个 row 时，通过布隆过滤器可以显著降低数据库的 IO 请求数量。
 

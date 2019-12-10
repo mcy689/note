@@ -40,14 +40,11 @@
 <details>
 <summary><b>目录</b></summary>
 
-* [字符串](Redis/基础.md)
-* [哈希表](Redis/基础.md)
-* [列表](Redis/基础.md)
-* [有序集合](Redis/基础.md)
 * [HyperLogLog](Redis/HyperLogLog.md)
 * [Stream](Redis/Stream.md)
 * [持久化](Redis/持久化.md)
 * [复制](Redis/复制.md)
 * [优化](Redis/优化.md)
+* [源码](Redis/源码.md)
 </details>
 
