@@ -45,6 +45,7 @@
 * [持久化](Redis/持久化.md)
 * [复制](Redis/复制.md)
 * [优化](Redis/优化.md)
+* [命令行](Redis/命令行.md)
 * [源码](Redis/源码.md)
 </details>
 
