@@ -76,3 +76,31 @@
 
 4. 还可以反向查询，使用 `XREVRANGE` 命令即可，用法与 `XRANGE` 相同。
 
+## 独立消费
+
+使用 `xread` 时，完全忽略消费组 (Consumer Group) 的存在，就好比 Stream 就是一个普通的列表 (list)。
+
+1. 命令格式
+
+   ```redis
+   xread [count count][block milliseconds] streams key [key ...] ID [ID ...]
+   ```
+
+2. 非阻塞形式
+
+   ```redis
+   > xread count 2 streams mystream 0
+   1) 1) "mystream"
+      2) 1) 1) "1576160076982-0"
+            2) 1) "name"
+               2) "hello"
+         2) 1) "1576160087747-0"
+            2) 1) "name"
+               2) "mysql"
+   ```
+
+3. 阻塞命令形式
+
+   ```redis
+   >xread block 0 streams mystream $
+   ```
