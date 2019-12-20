@@ -18,14 +18,12 @@
 2.  比如同一条数据，a系统会用，b系统也会用到，那么这时候要用消费组了。 a系统如果只有一个消费者会造成吞吐不够的情况，redis stream consumer group可以在同一个消费组里有多个消费者，consumer消费者多了，吞吐自己就上来了。 redis stream是可以保证这些操作原子性的。
 3. stream又维护了一个pending_ids的数据，他的作用是维护消费者的未确认的id，比如消费者get了数据，但是返回给你的时候网络异常了，crash了，又比如消费者收到了，但是crash掉了？ redis stream维护了这些没有xack的id. 我们可以xpending来遍历这些数据，xpending是有时间信息的，我们可以在代码层过滤一个小时之前还未xack的id。
 
-## 向 Stream 添加元素
+## 添加元素
 
 ```html
 127.0.0.1:6379> xadd test * name mcy
 "1551019218747-0"
 ```
-
-### 解析：
 
 1. mystream 是 stream的key
 
@@ -35,7 +33,7 @@
 
 4. 返回值是新增元素的ID，由时间戳和递增数字构成
 
-## 获取 Stream 中的数量
+## 获取数量
 
 ``` html
 127.0.0.1:6379> xlen test
@@ -104,3 +102,73 @@
    ```redis
    >xread block 0 streams mystream $
    ```
+
+## 消费组
+
+![group](./image/group.png)
+
+```redis
+#表示从头开始消费，包含历史数据
+xgroup create mystream mygroup 0-0
+
+# 表示从尾部开始消费，只接受新消息,$表示最新
+xgroup create mystream mygroup $
+
+# strem 信息
+127.0.0.1:6379> xinfo stream mystream
+ 1) "length"
+ 2) (integer) 1				#共3个消息
+ 3) "radix-tree-keys"
+ 4) (integer) 1
+ 5) "radix-tree-nodes"
+ 6) (integer) 2
+ 7) "groups"
+ 8) (integer) 1				#1个消费组
+ 9) "last-generated-id"
+10) "1576812015426-0"
+11) "first-entry"			#第一条消息
+12) 1) "1576812015426-0"
+    2) 1) "db"
+       2) "redis"
+13) "last-entry"			#最后一个消息
+14) 1) "1576812015426-0"
+    2) 1) "db"
+       2) "redis"
+
+# stream 消费组信息
+127.0.0.1:6379> xinfo groups mystream
+1) 1) "name"
+   2) "mygroup"
+   3) "consumers"
+   4) (integer) 0           #该消费组没有消费者
+   5) "pending"
+   6) (integer) 0			#该消费组没有正在处理的消息
+   7) "last-delivered-id"
+   8) "1576812015426-0"
+```
+
+## 消费
+
+1. `xreadgroup ` 可以进行消费组的组内消费。
+
+   ```redis
+   xreadgroup group mygroup alice count 1 streams mystream >
+   ```
+
+   * `>` 是特殊的ID，该特殊ID仅在使用者组的上下文中有效。将仅返回到目前为止从未发送给其他使用者的新消息。
+   * 如果该ID是任何有效的数字ID，则命令将使我梦能够访问待处理消息的历史记录。即已传递给使用者的消息集，到目前为止尚未用`xack`确认。
+
+2. `xack` 消息处理完成后的确认。
+
+   ```redis
+   127.0.0.1:6379> xreadgroup group mygroup alice count 1 streams mystream >
+   1) 1) "mystream"
+      2) 1) 1) "1576825125047-0"
+            2) 1) "db"
+               2) "mysql"
+   127.0.0.1:6379> xack mystream mygroup 1576825125047-0
+   (integer) 1
+   ```
+
+
+
