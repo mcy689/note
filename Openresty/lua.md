@@ -1,5 +1,9 @@
 # lua
 
+## 数据类型
+
+
+
 1. lua的注释
 
    ```lua
@@ -21,7 +25,7 @@
    for k,v in pairs(tab1) do
    	print(k..'-'..v)
    end
-
+   
    tab1.key1 = nil
    for k,v in pairs(tab1) do
    	print(k..'-'..v)
@@ -325,32 +329,32 @@
 
 10. lua中的模块
 
-   1. Lua的模块是由变量, 函数等已知元素组成的table
+  1. Lua的模块是由变量, 函数等已知元素组成的table
 
-      ```lua
-      --module.lua 文件
-          module = {}
-          --这是声明常量
-          module.constant = '这是一个常量'
-          --这是一个公有函数
-          function module.func1()
-              io.write('这是一个公有函数!\n')
-          end
-          --私有函数
-          local function func2()
-              print('这是一个私有函数!')
-          end
-          --调用私有函数
-          function module.func3()
-              func2()
-          end
-      	return module
-      --引用文件modul.lua
-          b = require('./module')
-          print(b.constant)
-          b.func3()
+     ```lua
+     --module.lua 文件
+         module = {}
+         --这是声明常量
+         module.constant = '这是一个常量'
+         --这是一个公有函数
+         function module.func1()
+             io.write('这是一个公有函数!\n')
+         end
+         --私有函数
+         local function func2()
+             print('这是一个私有函数!')
+         end
+         --调用私有函数
+         function module.func3()
+             func2()
+         end
+     	return module
+     --引用文件modul.lua
+         b = require('./module')
+         print(b.constant)
+         b.func3()
 
-      ```
+     ```
 
 11. Lua元表
 
@@ -394,7 +398,46 @@
 12. 协同程序
 
     * 线程与协同程序的主要区别在于, 一个具有多个线程的程序可以同时运行几个线程, 而协同程序却需要彼此协作的运行
-
     * 在任一指定时刻只有一个协同程序在运行, 并且这个正在运行的协同程序只有在明确的被要求挂起的时候才会被挂起
 
-      ​
+13. #### table的声明
+
+    1. 什么是table？
+
+       - table是`Lua`最复杂最强大的数据结构，`Lua` 本身并不是面向对象语言。最简单地，我们可以把table理解为数组，最复杂的，我们可以把table理解为”世间万物”，因为它可以创造出很多你想象不到的东西。
+
+    2. 创建table
+
+       ```lua
+       local a = {}
+       ```
+
+    3. 初始化table, 以及使用
+
+       ```lua
+       --第一种
+         local a = {["x"] = 12, ["mutou"] = 99, [3] = "hello"}
+         print(a["x"]);
+       --第二种
+         local a = {x = 12, mutou = 99, [3] = "hello"}
+         print(a["x"]);
+       --第三种
+         local a = {x = 12, mutou = 99, [3] = "hello"}
+         print(a.x); --记住，是字符串下标才这么做。
+       --第四种
+         local a = {[1] = 12, [2] = 43, [3] = 45, [4] = 90}
+         local a = {12, 43, 45, 90}  --这个下标是从1开始的
+         print(a[1]);  --与第三种对比较, 数字的时候必须按规矩来
+       --第五种 table中的table
+         local a = {
+            {x = 1, y = 2},
+            {x = 3, y = 10}
+           }
+          print(type(a));      --table
+          print(type(a[1]));   --table
+          print(a[1].x);       --1
+         --[[
+             因此，a的第一个元素就是{x = 1, y = 2}，调用a的第一个元素的方式为：a[1]
+             由于a[1]又是一个table，所以，再次调用table的x下标的值：a[1].x
+         --]]
+       ```
