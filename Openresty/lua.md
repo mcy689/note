@@ -50,8 +50,8 @@ end
 
 ```lua
 --声明
-    string1 = '这是字符串'
-    string2 = "这是字符串"
+    string1 = 'hello'
+    string2 = "hello lua"
     string3 = [[
         <html>
         <head> </head>
@@ -68,6 +68,9 @@ end
     len = 'www.runoob.com'
     print(#len);  -- 14
 ```
+
+1. Lua 的字符串是不可改变的值，不能像在 c 语言中那样直接修改字符串的某个字符，而是根据修改要求来创建一个新的字符串。
+2. Lua 的字符串不能通过下标来访问字符串的某个字符。
 
 ### number
 
@@ -190,6 +193,45 @@ print(average(10,23,19,30));	--20.5
 
 是一种用户自定义数据，用于表示一种由应用程序或 C/C++ 语言库所创建的类型，可以将任意 C/C++ 的任意数据类型的数据（通常是 struct 和 指针）存储到 Lua 变量中调用。
 
+## 表达式
+
+```lua
+--算术
+print(1+3)		-- 3	加
+print(1-3)		-- -2	减
+print(1*2)		-- 2	乘
+print(5/20)		-- 0.25	除
+print(2^3)		-- 8	指数
+print(print(57%50))	-- 7 取模
+
+--关系运算
+print(1 < 2)			--true		小于
+--[[
+	> 大于
+	<= 小于等于
+	>= 大于等于
+--]]
+print(1 == 2)			--false		等于
+print(1 ~= 2)			--true		不等于
+
+--逻辑运算
+--[[
+	and	逻辑与
+	or  逻辑或
+	not	逻辑非
+--]]
+local c = nil
+local d = 0
+local e = 100
+print(c and d)  -->打印 nil
+print(c and e)  -->打印 nil
+print(d and e)  -->打印 100
+print(c or d)   -->打印 0
+print(c or e)   -->打印 100
+print(not c)    -->打印 true
+print(not d)    -->打印 false
+```
+
 ## 变量
 
 ```lua
@@ -270,6 +312,8 @@ print(a,b) --nil 6
    	f() 返回两个值, 第一个赋给a, 第二个赋给b
    --]]
    ```
+
+## 控制结构
 
 ## 迭代器
 
