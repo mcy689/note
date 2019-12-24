@@ -270,6 +270,26 @@ print(a,b) --nil 6
 
 1. 局部变量的作用域为从声明位置开始到所在语句块结束。
 
+#### 优势
+
+1. 局部变量可以避免因为命名问题污染了全局环境。
+2. local 变量的访问比全局变量更快。
+3. 由于局部变量出了作用域之后生命周期结束，这样可以被垃圾回收器及时释放。
+
+### 虚变量
+
+当一个方法返回多个值时，有些返回值有时候用不到，可以以一个下划线`_` 来命名，用它来表示丢弃不需要的数值，仅仅起到占位的作用。
+
+```lua
+-- string.find (s,p) 从string 变量s的开头向后匹配 string
+-- p，若匹配不成功，返回nil，若匹配成功，返回第一次匹配成功的起止下标。
+
+local start,finish = string.find("hello","he")
+print(start,finish) 	-- 1       2
+
+local _, finish = string.find("hello","he")
+```
+
 ## 赋值
 
 1. Lua可以对多个变量同时赋值, 变量列表和值列表的各个元素用逗号分开, 赋值语句右边的值会依次赋给左边的变量。
@@ -460,3 +480,37 @@ until false
    print(mytabl.key1,mytabl.key2)
    ```
 
+## 点号和冒号操作符的区别
+
+```lua
+local str = "abcde"
+print("case 1:",str:sub(1,2))
+print("case 2:",str.sub(str,1,2))
+
+--执行结果
+case 1: ab
+case 2: ab
+```
+
+1. 冒号操作回带入一个`self` 参数，用来代表**自己**。而点号操作，只是内容的展开。
+
+2. 在函数定义时，使用冒号将默认接收一个`self` 参数，而使用点号则需要显式传入 `self` 参数。
+
+   ```lua
+   local obj = {x = 20}
+   function obj:fun()
+       print(self.x)
+   end
+   
+   --等价于
+   local obj = {x = 20}
+   function obj.fun()
+       print(self.x)
+   end
+   ```
+
+3. 冒号的操作，只有当变量时类对象时才需要。
+
+---
+
+**引用[OpenResty最佳实践](https://moonbingbing.gitbooks.io/openresty-best-practices)**
