@@ -315,6 +315,47 @@ print(a,b) --nil 6
 
 ## 控制结构
 
+### if
+
+```lua
+--单个 if 分支
+local a = 30
+if a > 0 then
+    print("a is a positive number")
+end
+
+--两个分支 if-else 型
+local a = 10
+if a > 0 then
+    print("a is a positive number")
+else
+    print("a is a non-positive number")
+end
+```
+
+### while
+
+```lua
+local x = 1
+local sum = 0
+while x <= 5 do
+    sum = sum + x
+    x = x + 1
+end
+```
+
+### repeat
+
+```lua
+-- 该代码导致死循环，因为until的条件一直为假，循环不会结束
+x =10
+repeat
+    print(x)
+until false
+```
+
+### break、return 和 goto
+
 ## 迭代器
 
 1. 泛型for迭代器。
@@ -359,6 +400,8 @@ print(a,b) --nil 6
    ```
 
 ## 模块
+
+**对于需要导出给外部使用的公共模块，处于安全考虑，是要避免全局变量的出现。**
 
 ```lua
 --module.lua 文件
@@ -416,3 +459,4 @@ print(a,b) --nil 6
      })
    print(mytabl.key1,mytabl.key2)
    ```
+
