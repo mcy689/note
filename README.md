@@ -52,6 +52,7 @@
 <summary><b>目录</b></summary>
 
 * [Lua](Openresty/lua.md)
+* [lua_exmple](Openresty/lua_exmple.md)
 </details>
 
 ## Redis
