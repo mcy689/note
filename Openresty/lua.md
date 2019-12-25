@@ -196,6 +196,16 @@ print(average(10,23,19,30));	--20.5
   a3["key"] = "val"
   print(a3["key"])  --val
   print(a3["none"]) --nil
+
+-- table 既不是“值”也不是“变量”，而是“对象”。可以将一个table想象成一个动态分配的对象，程序仅持有一个对它们的引用。
+local a ={}		-- 创建一个table，并将它的引用存储到a
+a["x"] = 10
+local b = a
+print(b["x"])	--10
+b["x"] = 20
+print(a["x"])	--20
+a = nil			--现在只有b还在引用table
+b = nil			--再没有对table的引用了
 ```
 
 ### userdata 
