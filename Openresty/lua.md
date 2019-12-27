@@ -511,25 +511,28 @@ case 1: ab
 case 2: ab
 ```
 
-1. 冒号操作回带入一个`self` 参数，用来代表**自己**。而点号操作，只是内容的展开。
+1. 冒号操作会带入一个`self` 参数，用来代表**自己**。而点号操作，只是内容的展开。
 
 2. 在函数定义时，使用冒号将默认接收一个`self` 参数，而使用点号则需要显式传入 `self` 参数。
 
    ```lua
    local obj = {x = 20}
-   function obj:fun()
+   function obj.fun(self)
        print(self.x)
    end
+   obj:fun()
    
    --等价于
    local obj = {x = 20}
-   function obj.fun()
+   function obj.fun(self)
        print(self.x)
    end
+   obj.fun(obj)
    ```
 
-3. 冒号的操作，只有当变量时类对象时才需要。
+3. 冒号的操作，只有当变量是类对象时才需要。
 
 ---
 
 **引用[OpenResty最佳实践](https://moonbingbing.gitbooks.io/openresty-best-practices)**
+
