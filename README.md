@@ -32,6 +32,8 @@
 
 来访雁丘处。
 
+[概念](./触动-概念.md)
+
 ## 随笔
 <details>
 <summary><b>目录</b></summary>
