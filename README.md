@@ -58,6 +58,7 @@
 
 * [Lua](Openresty/lua.md)
 * [lua_exmple](Openresty/lua_exmple.md)
+* [lua程序设计](Openresty/lua程序设计.md)
 </details>
 
 ## Redis
