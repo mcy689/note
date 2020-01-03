@@ -164,3 +164,19 @@ end)
 print(coroutine.resume(co,20,30,40));
 ```
 
+## 弱引用 table
+
+```lua
+-- 在本例中，第二句赋值 key = {} 会覆盖第一个key。当收集器运行时，由于没有其他地方在引用第一个 key，因此第一个 key 就被回收了，并且 table中的相应条目也被删除了。至于第二个key，变量key仍引用它，因此它没有被回收
+a = {}
+b = {__mode = "k"}
+setmetatable(a,b)       -- 现在'a'的key就是弱引用
+key = {}                -- 创建第一个key
+a[key] = 1
+key = {}                -- 创建第二个key
+a[key] = 2
+collectgarbage()        -- 强制进行一次垃圾收集
+for k, v in pairs(a) do
+    print(v)
+end
+```
