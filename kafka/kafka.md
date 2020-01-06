@@ -37,6 +37,3 @@
    kafka-topics.sh --alter --zookeeper server-1:2181 server-2:2181 server-3:2181 --partitions 4 --topic test-topic
    ```
 
-### 消费者
-
-1. 查看消费偏移量
