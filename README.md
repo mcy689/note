@@ -110,9 +110,12 @@
 * [Oplog日志](MongoDB/Oplog日志.md)
 </details>
 
-## vim
+## Linux
 <details>
 <summary><b>目录</b></summary>
 
-* [备忘录](vim/备忘录.md)
+* [rsync](Linux/rsync.md)
+* [sed和awk](Linux/sed和awk.md)
+* [修改时区](Linux/修改时区.md)
+* [vim](Linux/vim.md)
 </details>
