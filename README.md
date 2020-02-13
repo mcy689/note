@@ -116,6 +116,7 @@
 
 * [用户和用户组](Linux/用户和用户组.md)
 * [sed和awk](Linux/sed和awk.md)
+* [sort、wc、uniq](Linux/sort、wc、uniq.md)
 * [rsync](Linux/rsync.md)
 * [修改时区](Linux/修改时区.md)
 * [vim](Linux/vim.md)
