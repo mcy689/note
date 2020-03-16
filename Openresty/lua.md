@@ -249,6 +249,9 @@ print(c or d)   -->打印 0
 print(c or e)   -->打印 100
 print(not c)    -->打印 true
 print(not d)    -->打印 false
+
+--类似三元运算符
+print(false and 5 or 10)
 ```
 
 ## 变量
