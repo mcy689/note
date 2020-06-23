@@ -15,19 +15,18 @@
 	#stash@{1}: WIP on master: c264051 Revert "added file_size"
 	#stash@{2}: WIP on master: 21d80a5 added number to log
 	
-# 重新应用存储的信息
-	git stash apply				# 默认应用最新的
-	git stash apply stash@{2}	# 通过名字指定应用
-	
+# 重新应用存储。apply 选项只尝试应用储藏的工作——储藏的内容仍然在栈上。
+	git stash apply					# 默认最新的一条
+	git stash apply stash@{2}		# 通过名字指定应用
+	git stash pop 					# 来重新应用储藏，并将储藏删掉
+
 # 文件的改动被重新应用了，但是之前暂存的文件却没有重新暂存。 想要那样的话，必须使用 --index 选项来运行 git stash apply 命令，来尝试重新应用暂存的修改。
 	git stash apply --index
 
-# git stash drop 移除堆栈的信息，并应用它
+# git stash drop 删除存储。
 	git stash drop stash@{2}
+
+# 存储未被跟踪的文件
+	git stash -u
 ```
 
-## 存储未被跟踪的文件
-
-```shell
-git stash -u
-```
