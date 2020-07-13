@@ -35,27 +35,6 @@ cat -t table.log                    #查看制表符 说明：这个命令可以
    scriptreplay time.log action.log
    ```
 
-## xargs 将命令输出作为命令参数
-
-1. ![屏幕快照 2019-04-01 下午10.30.53](./image/2019-04-01.png)
-
-2. 用自己的定界符来分隔参数
-
-   ```shell
-   echo "splitXsplitXsplit" | xargs -d X	#使用X为定界符
-   cat example.txt | xargs -i touch {}		#创建文件
-   cat example.txt | xargs -i rm {}		#删除匹配的文件
-   ```
-
-3. Find 和 xargs 结合使用
-
-   ```shell
-   #find匹配并列出所有的.txt文件，并删除
-   	find . -type f -name "*.jpg" -print0 | xargs -0 rm -f
-   #统计php文件的行数
-    	find . -maxdepth 1 -type f -name "*.php" -print0 | xargs -0 wc -l
-   ```
-
 ## 用 tr 进行转换检查与词典操作
 
 `tr` 只能通过 stdin（标准输入），而无法通过命令行参数来接受输入。 `tr [options] set1 set2` ,将来自stdin 的输入字符从 set1 映射到 set2，并将其输出写入 stdout（标准输出）。
