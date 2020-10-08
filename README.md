@@ -55,13 +55,6 @@
 </details>
 
 <details>
-<summary><b>OpenResty</b></summary>
-
-* [Lua](Openresty/lua_manual.md)
-* [lua_exmple](Openresty/lua_exmple.md)
-</details>
-
-<details>
 <summary><b>Redis</b></summary>
 
 * [HyperLogLog](Redis/HyperLogLog.md)
