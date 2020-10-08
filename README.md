@@ -40,6 +40,8 @@
 
 ## 编程
 
+[概念](./概念.md)
+
 <details>
 <summary><b>Git</b></summary>
 
@@ -122,5 +124,3 @@
 
 * [学习笔记](Lua/学习笔记.md)
 </details>
-
-[概念](./概念.md)
