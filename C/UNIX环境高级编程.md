@@ -1,143 +1,145 @@
+## 基础知识
+
+1. 创建新目录时会自动创建了两个文件名：`.` 和 `..` 。点指向当前目录，点点指向父目录。最高层次的根目录中，点点与点相同。
+2. 每个进程都有一个**工作目录** ，有时称其为当前工作目录。所有相对路径名都从工作目录开始解释。进程中使用 `chdir` 函数更改其工作目录。
+3. UNIX 系统确保每个进程都有一个唯一的数字标识符，称为进程ID。
+
+### 出错处理
+
+1. 当 UNIX 系统函数出错时，通常会返回一个负值，而且整型变量 errno 通常被设置为具有特定信息的值。
+2. 对于 errno 应当注意两条规则。第一条规则是：如果没有出错，其值不会被例程清除。因此，仅当函数的返回值指明出错时，才检验其值。第二条规则是：任何函数都不会将 errno 值设置为0。
+
 ## 文件 I/O
 
-### 文件描述符
+### 文件类型
 
-1. 文件描述符是一个非负整数。当打开一个现有文件或创建一个新文件时，内核向进程返回一个文件描述符。当读、写一个文件时，使用 open 或 creat 返回的文件描述符标识该文件，将其作为参数传送给 read 或 write。
+1. 普通文件。包含某种形式的数据。至于这种数据是文本还是二进制数据，对于 UNIX 内核而言并无区别。
 
-2. 文件描述符 0 与进程的标准输入关联，文件描述符 1 与标准输出关联，文件描述符 2 与标准错误关联。
+2. 目录文件。这种文件包含了其他文件的名字以及指向这些文件有关信息的指针。
+
+3. 块特殊文件。这种类型的文件提供对设备（如磁盘）带缓冲的访问，每次访问以固定长度为单位进行。
+
+4. 字符特殊文件。这种类型的文件提供对设备不带缓冲的访问，每次访问长度可变。系统中的所有设备要么是字符特殊文件，要么是块特殊文件。
+
+5. FIFO。这种类型的文件用于进程间通信，有时也称为命名管道。
+
+6. 套接字。这种类型的文件用于进程间的网络通信。套接字也可用于在一台宿主机上进程之间的非网络通信。
+
+7. 符号链接。这种类型的文件指向另一个文件。
 
    ```c
-   #include <unistd.h> //头文件 <unistd.h> 定义了
+   #include <stdio.h>
+   #include <sys/stat.h>
    
-   #define	 STDIN_FILENO	0	/* standard input file descriptor */
-   #define	STDOUT_FILENO	1	/* standard output file descriptor */
-   #define	STDERR_FILENO	2	/* standard error file descriptor */
+   int main(int argc, char *argv[])
+   {
+       int i;
+       struct stat buf;
+       char *ptr;
+       for (i = 1; i < argc; i++)
+       {
+           printf("%s\n", argv[i]);
+           if (lstat(argv[i], &buf) < 0)
+           {
+               printf("error\n");
+               continue;
+           }
+           if (S_ISREG(buf.st_mode))
+           {
+               ptr = "regular";
+           }
+           else if (S_ISDIR(buf.st_mode))
+           {
+               ptr = "directory";
+           }
+           else if (S_ISCHR(buf.st_mode))
+           {
+               ptr = "character special";
+           }
+           else if (S_ISBLK(buf.st_mode))
+           {
+               ptr = "block special";
+           }
+           else if (S_ISFIFO(buf.st_mode))
+           {
+               ptr = "fifo";
+           }
+           else if (S_ISLNK(buf.st_mode))
+           {
+               ptr = "symbolic link";
+           }
+           else if (S_ISSOCK(buf.st_mode))
+           {
+               ptr = "socket";
+           }
+           else
+           {
+               ptr = "** unknown mode **";
+           }
+           printf("%s\n", ptr);
+       }
+   }
+   
+   // ./file_stat /etc/passwd
    ```
 
-###`open` 和 `openat`
+
+## 标准 I/O 库
+
+标准 I/O 库，它们的操作是围绕流进行。流的**定向** 决定了所读、写的字符是单字节还是多字节的。当一个流最初被创建时，它并没有定向。如若在为定向的流上使用一个多字节 I/O 函数，则将该流的定向和设置为宽定向的。若在未定向的流上使用一个单字节 I/O 函数，则将该流的定向设为字节定向的。
+
+## 进程环境
+
+### C 程序的存储空间布局
+
+1. 正文段。这是由 CPU 执行的机器指令部分。通常，正文段是可共享的，所以即使是频繁执行的程序在存储器中也只需有一个副本，正文段常常是只读的，以防止程序由于意外而修改其指令。
+
+2. 初始化数据段。通常将此段称为数据段，它包含了程序中需明确地赋初值的变量。
+
+   ```c
+   int i = 0;
+   ```
+
+3. 未初始化数据段。通常将此段称为 `bss` 段，在程序开始执行之前，内核将此段中的数据初始化为0或空指针。函数外的声明
+
+   ```c
+   long sum[100];
+   ```
+
+4. 栈。局部变量以及每次函数调用时所需保存的信息都存放在此段中。每次函数调用时，其返回地址以及调用者的环境信息。然后，最近被调用的函数在栈上为其自动和临时变量分配存储空间。通过以这种方式使用栈，C递归函数可以工作。递归函数每次调用自身时，就用一个新的栈帧，因此一次函数调用实例中的变量集不会影响另一次函数调用实例中的变量。
+
+5. 堆。通常在堆中进行动态存储分配。堆位于未初始化数据段和栈之间。
+
+### 存储空间
 
 ```c
-/*
- 文件目录
-  1.txt
-  hello.c
-  change
-    2.txt
-*/
-#include <stdio.h>
-#include <fcntl.h>
+#include <stdlib.h>
 
-int main()
-{
-    int fd_file = open("./1.txt",O_RDONLY); //3
-    int fd_dir = open("./change",O_DIRECTORY); //4
-    int fd_file_2 = openat(fd_dir,"2.txt",O_RDONLY);//基于打开目录的相对路径打开文件
-    printf("%d\n\%d\n\%d\n",fd_file,fd_dir,fd_file_2); //3
-}
+void *malloc(size_t size);
+void *calloc(size_t nobj, size_t size);
+void *realloc(void *ptr, size_t newsize);
+
+void free(void *ptr);
 ```
 
-### close
+可能产生的致命性错误是：释放一个已经释放了的块；调用 free 时所用的指针不是3个 alloc 函数的返回值等。如若一个进程调用 malloc 函数，但却忘记调用 free 函数，那么该进程占用的存储空间就会连续增加，这就称为 **泄漏**。如果不调用 free 函数释放不再使用的空间，那么进程地址空间长度就会慢慢增加，直至不再有空闲空间。此时，由于过度的换页开销，会造成性能下降。
 
-1. 关闭一个文件时还会释放改进程加在该文件上的所有记录锁。
-2. 当一个进程终止时，内核自动关闭它所有的打开文件。
+## 进程
 
-```c
-#include <unistd.h>
-
-int close(int fd);
-```
-
-### `lseek`
-
-1. 每个打开文件都有一个与其相关联的“当前文件偏移量”。用以度量文件开始处计算的字节数。
-2. 通常，读、写操作都从当前文件偏移量处开始，并使偏移量增加所读写的字节数。
-3. 按系统默认的情况，当打开一个文件时，除非指定`O_APPEND` 选项，否则该偏移量被设置为0。
-4. `lseek` 显式地为一个打开文件设置偏移量。仅将当前的文件偏移量记录在内核中，它并不引起任何 `I/O` 操作。
-5. 文件偏移量可以大于文件的当前长度，在这种情况下，对该文件的下一次写将加长该文件，并在文件中构成一个空洞。位于文件中但没有写过的字节都被读为0。
+1. 每个进程都有一个非负整型表示的唯一进程ID。
+2. ID 为 0 的进程通常是调度进程，常常被称为交换进程。该进程是内核的一部分，它并不执行任何磁盘上的程序，因此也被称为系统进程。
+3. `fork` 函数被调用一次，但返回两次。两次返回的区别是子进程的返回值是0，而父进程的返回值则是新建子进程的进程ID。
+4. 子进程和父进程继续执行 fork 调用之后的指令。子进程是父进程的副本。例如，子进程获得父进程数据空间、堆和栈的副本。
 
 ```c
-/*
-	#include <unistd.h>
-	off_t lseek(int fd, off_t offset, int whence);
-                                               错误返回 -1
-   1. whence 是 SEEK_SET，则将该文件的偏移量设置为距文件开始处 offset 个字节。
-   2. whence 是 SEEK_CUR，则将该文件的偏移量设置为其当前值加 offset，offset 可为正或负。
-   3. whence 是 SEEK_END，则将该文件的偏移量设置为文件长度 offset，offset 可正可负。
-*/
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
+#inlude <unistd.h>
 
-int main()
-{
-    int fd_file = open("./1.txt",O_RDONLY); //3
-    int seek = lseek(fd_file,0,SEEK_CUR);
-    printf("%d\n",seek);
-}
-```
-
-### pread 和 pwrite
-
-1. UNIX 系统提供了原子操作。即在打开文件时设置为 `O_APPEND` 标志。这样做使得内核在每次写操作之前，都将进程的当前偏移量设置到该文件的尾端处。
-
-```c
-/*
-  允许原子性定位并执行 `I/O`。
-  #include <unistd.h>
-  ssize_t pread(int fd,void *buf,size_t nbytes, off_t offset);
-                                      //返回值：读到的字节数，若已到文件尾，返回0；若出错，返回-1
-  ssize_t pwrite(int fd, const void *buf, size_t nbytes, off_t offset);
-                                      //返回值：若成功，返回已写的字节数；若出错，返回-1
-*/
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-
-int main(void)
-{
-    char str[11];
-    int fd_file = open("./1.txt",O_RDONLY);
-    unsigned int a = pread(fd_file,str,10,0);
-    printf("%d\n%s\n%d\n",a,str,fd_file);
-}
-```
-
-### dup 和 dup2
-
-都可用来复制一个现有的文件描述符。
-
-```c
-#include <unistd.h>
-
-int dup(int fd);
-int dup2(int fd, int fd2);
-```
-
-### sync、fsync 和 fdatasync
-
-1. 传统的UNIX系统实现在内核中设有缓冲区或页高速缓存，大多数磁盘`I/O` 都通过缓冲区进行。当向文件写入数据时，内核通常先将数据复制到缓存区中，然后排入队列，晚些时候再写入磁盘。这种方式被称为 **延时写**。
-
-2. 为了保证磁盘上实际文件系统与缓冲区中内容的一致性，提供了下面三个函数。
-
-```c
-#include <unistd.h>
-
-int fsync(int fd);
-int fdatasync(int fd);
-
-void sync(void);
-```
-
-## 文件和目录
-
-### stat、fstat、fstatat 和 lstat
-
-```c
-#include <sys/stat.h>
-
-int stat(const char *restrict pathname, struct stat *restrict buf);
-int fstat(int fd, struct stat *buf);
-int lstat(const chat *restrict pathname, struct stat *restrict buf);
-int fstatat(int fd, const char *restrict pathname, struct stat *restrict buf, int flag);
+pid_t getpid(void); //返回值：调用进程的进程ID
+pid_t getppid(void); //返回值：调用进程的父进程ID
+uid_t getuid(void); // 返回值：调用进程的实际用户ID
+uid_t geteuid(void); //返回值：调用进程的有效用户ID
+gid_t getgid(void); //返回值：调用进程的实际组
+gid_t getegid(void); //返回值：调用进程的有效组ID
+pid_t fork(void); //返回值：子进程返回0，父进程返回子进程ID；若出错，返回-1。
 ```
 
