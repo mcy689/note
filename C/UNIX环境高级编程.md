@@ -95,16 +95,21 @@ int main(int argc, char *argv[])
 9. 函数 `lseek`，显式地为一个打开文件设置偏移量。每个打开文件都有一个与其相关联的“当前文件偏移量”。它通常是一个非负整数，用以度量从文件开始处计算的字节数。**按系统默认的情况，当打开一个文件时，除非指定了 `O_APPEND` 选项，否则该偏移量被设置为 0** 。
 
    ```c
-    #include <unistd.h>
+   #include <unistd.h>
       off_t lseek(int fd, off_t offset, int whence);
     					//返回值：若成功，返回新的文件偏移量；若出错，返回为-1。
-      //对参数 offset 的解释于参数 whence 的值有关。
-           //若 whence 是 SEEK_SET, 则将该文件的偏移量设置为距文件开始处 offset 个字节。
-           //若 whence 是 SEEK_CUR，则将该文件的偏移量设置为其当前值加 offset，offset 可为正或负。
-           //若 whence 是 SEEK_END，则将该文件的偏移量设置为文件长度加 offset，offset 可正可负。
-   	 //确定打开文件的当前偏移量
-           //off_t currpos;
-           //currpos = lseek(fd, 0 , SEEK_CUR);
+      /*
+       1. 对参数 offset 的解释于参数 whence 的值有关。
+           若 whence 是 SEEK_SET, 则将该文件的偏移量设置为距文件开始处 offset 个字节。
+           若 whence 是 SEEK_CUR，则将该文件的偏移量设置为其当前值加 offset，offset 可为正或负。
+           若 whence 是 SEEK_END，则将该文件的偏移量设置为文件长度加 offset，offset 可正可负。
+   	  2. 确定打开文件的当前偏移量
+           off_t currpos;
+           currpos = lseek(fd, 0 , SEEK_CUR);
+       3. lseek 仅将当前的文件偏移量记录在内核中，它并不引起任何I/O操作。然后，该偏移量用于下一个读或写操作。
+       4. 文件偏移量可以大于文件的当前长度，在这种情况下对该文件的下一次写将加长才文件并在文件中构成一个空洞。位于文件中但没有写过的字节都被读为0。
+       5. 文件中的空洞并不要求在磁盘上占用存储区。具体处理方式与文件系统的实现有关，当定位到超出文件尾端之后写时，对于新写的数据需要分配磁盘块，但是对于原文件尾端和新开始写位置之间的部分则不需要分配磁盘块。
+      */
    
    //例子1. 测试标准输入是否可以设置偏移量
    #include <stdio.h>
@@ -119,6 +124,68 @@ int main(int argc, char *argv[])
        }
        exit(0);
    }
+   
+   //例子2. 创建一个具有空洞的文件。
+   #include <stdlib.h>
+   #include <stdio.h>
+   #include <unistd.h>
+   #include <fcntl.h>
+   
+   #define FILE_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
+   
+   char buf1[] = "abcdefghij";
+   char buf2[] = "ABCDEFGHIJ";
+   
+   int main()
+   {
+       int fd;
+       if ((fd = creat("file.hole", FILE_MODE)) < 0){
+           printf("creat error");
+           exit(0);
+       }
+       if (write(fd, buf1, 10) != 10) {
+           printf("creat error");
+           exit(0);
+       }
+       if (lseek(fd, 16384, SEEK_SET) == -1) {
+           printf("lseek error");
+           exit(0);
+       }
+       if (write(fd, buf2, 10) != 10){
+           printf("buf2 write error");
+       }
+       exit(0);
+   }
    ```
 
-   
+10. 函数 `read`。
+
+    ```c
+    #include <unistd.h>
+    
+      ssize_t read(int fd, void *buf, size_t nbytes);
+           //返回值：读到的字节数，若已到文件尾，返回0；若出错，返回-1；
+      /*
+       有多种情况可使实际读到的字节数少于要求读的字节数。
+          1. 读普通文件时，在读到要求字节数之前已到达了文件尾端。
+          2. 当从终端设备读时，通常一次最多读一行。
+          3. 当从网络读时，网络中的缓冲机制可能造成返回值小于所要求读的字节数。
+          4. 当从管道或FIFO读时，如若管道包含的字节少于所需的数量，那么 read 将只返回实际可用的字节数。
+          5. 当从某些面向记录的设备（如磁带）读时，一次最多返回一个记录。
+          6. 当一信号造成中断，而已经读了部分数据量时。
+      */
+    ```
+
+11. 函数 `write`
+
+    ```c
+    #include <unistd.h>
+      ssize_t write(int fd, const void *buf, size_t nbytes);
+           //返回值：若成功，返回已写的字节数；若出错，返回-1
+      //对于普通文件，写操作从文件的当前偏移量处开始。如果在打开该文件时，指定了 O_APPEND 选项，则在每次写操作之前，将文件偏移量设置在文件的当前结尾处。在一次成功写之后，该文件偏移量增加实际写的字节数。
+    ```
+
+### 文件共享
+
+内核使用3种数据结构表示打开文件，它们之间的关系决定了在文件共享方面一个进程对另一个进程可能产生的影响。
+
