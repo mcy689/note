@@ -198,9 +198,9 @@ int main()
 
 3. `v-node`  表。同文件表一样，**所有的进程共享这张 `v-node` 表** 。每个表项包含 stat 结构中的大多数信息。
 
-   <img src="./image/unix-共享文件.png" alt="unix-共享文件" style="zoom:50%;" />
+   <img src="./image/unix-共享文件.png" alt="unix-共享文件"  />
 
-   ​	<img src="./image/unix-打开同一个文件.png" alt="unix-打开同一个文件" style="zoom:50%;" />
+   ​	<img src="./image/unix-打开同一个文件.png" alt="unix-打开同一个文件"  />
 
 ### 函数 `dup` 和 `dup2`
 
@@ -215,7 +215,7 @@ int main()
   */
 ```
 
-<img src="./image/unix-dup.png" alt="unix-dup" style="zoom:50%;" />
+<img src="./image/unix-dup.png" alt="unix-dup"  />
 
 ### 函数 `sync`、`fsync` 和 `fdatasync`
 
@@ -331,4 +331,237 @@ int main(int argc, char *argv[])
 2. 有效用户ID、有效组ID以及附属组ID决定了我们的文件访问权限。
 
 3. 保持的设置用户ID和保持的设置组ID在执行一个程序时包含了有效用户ID和有效组ID的副本。
+
+### 文件访问权限
+
+st_mode 值也包含了对文件的访问权限位。
+
+```c
+  S_IRWXU  //读写执行
+  S_IRUSR  //用户读
+  S_IWUSR  //用户写
+  S_IXUSR  //用户执行
+ 
+  S_IRWXG
+  S_IRGRP
+  S_IWGRP
+  S_IXGRP
+
+  S_IRWXO 
+  S_IROTH
+  S_IWOTH
+  S_IXOTH
+    
+  S_ISUID //执行时设置用户ID
+  S_ISGID //执行时设置组ID
+  S_ISVTX //保存正文（粘着位）
+```
+
+1. 对于目录的读权限和执行权限的意义是不相同的。读权限允许我们读目录，获得在该目录中所有文件名的列表。当一个目录是我们要访问文件的路径名的一个组成部分时，对该目录的执行权限使我们可通过该目录（也就是搜索该目录，寻找一个特定的文件名）。
+
+   例如，为了打开文件 `/usr/include/stdio.h` ，需要对目录 `/`，`/usr`，`/usr/include` 具有执行权限。然后，需要具有对文件本身的适当权限。
+
+2. 对于一个文件的读权限决定了我们是否能够打开现有文件进行读操作。
+
+3. 对于一个文件的写权限决定了我们是否能够打开现有文件进行写操作。
+
+4. 为了在一个目录中创建一个新文件，必须对该目录具有写权限和执行权限。
+
+5. 为了删除一个现有文件，必须对包含该文件的目录具有写权限和执行权限。对该文件本身则不需要有读、写权限。
+
+6. 如果用 7 个 exec 函数中的任何一个执行某个文件，都必须对该文件具有执行权限。该文件还必须是一个普通文件。
+
+### 新文件和目录的所有权
+
+1. 新文件的用户ID设置为进程的有效用户ID。
+2. 关于组ID允许实现选择下列之一作为新文件的组ID：
+   * 新文件的组ID可以是进程的有效组ID。
+   * 新文件的组ID可以是它所在目录的组ID。
+
+### 函数 access 和 faccessat
+
+```c
+#include <unistd.h>
+  int access(const char *pathname, int mode);
+  int faccessat(int fd, const char *pathname, int mode, int flag);
+        //两个函数的返回值：若成功，返回0；若出错，返回-1
+  /*
+  1. 按照实际用户ID和实际组ID进行访问权限测试的。
+  2. mode 参数
+       F_OK 测试文件是否存在
+       R_OK 测试读权限
+       W_OK 测试写权限
+       X_OK 测试执行权限
+   3. flag 设置为 AT_EACCESS，访问检查用的是调用进程的有效用户ID和有效组ID，而不是实际用户ID和实际组ID。
+  */
+
+//例子
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
+int main(int argc, char *argv[])
+{
+    if (argc != 2) {
+        printf("usage:a.out <pathname>\n");
+        exit(EXIT_FAILURE);
+    }
+    if (access(argv[1],R_OK) < 0) {
+        printf("access error for %s\n",argv[1]);
+        exit(EXIT_FAILURE);
+    } else {
+         printf("read access Ok\n");
+    }
+    if (open(argv[1],O_RDONLY) < 0) {
+        printf("open error for %s\n",argv[1]);
+        exit(EXIT_FAILURE);
+    } else {
+         printf("open for reading Ok\n");
+    }
+    exit(EXIT_SUCCESS);
+}
+```
+
+### 函数 umask
+
+`umask` 函数为进程设置文件模式创建屏蔽字，并返回之前的值。
+
+命令行查看`umask -S` 格式化的屏蔽字。
+
+```c
+#include <sys/stat.h>
+  mode_t umask(mode_t cmask);
+        //返回值：之前的文件模式创建屏蔽字
+
+//eg
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
+#define RWRWRW (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
+
+int main(void)
+{
+    umask(0);
+    if (creat("foo",RWRWRW) < 0) {
+        printf("creat error for foo");
+        exit(EXIT_FAILURE);
+    }
+    umask(S_IRUSR|S_IWUSR);
+    if (creat("bar",RWRWRW) < 0) {
+        printf("creat error for bar");
+        exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+}
+/*
+  machunyudeMacBook-Pro:example machunyu$ ls -l foo bar 
+  ----rw-rw-  1 machunyu  staff  0  1 27 11:29 bar
+  -rw-rw-rw-  1 machunyu  staff  0  1 27 11:29 foo
+*/
+```
+
+### 函数 chmod 、fchmod 和 fchmodat
+
+为了改变一个文件的权限位，进程的有效用户ID必须等于文件的所有者ID。或者该进程必须具有超级用户权限。
+
+```c
+#include <sys/stat.h>
+  int chmod(const char *pathname, mode_t mode);
+  int fchmod(int fd, mode_t mode);
+  int fchmodat(int fd, const char *pathname, mode_t mode, int flag);
+        //3个函数返回值：若成功，返回0；若出错，返回-1
+/*
+ 1. chmod 函数在指定的文件上进行操作。
+ 2. fchmod 函数则对已打开的文件进行操作。
+ 3. fchmodat 当设置了 AT_SYMLINK_NOFOLLOW 标志时，fchmodat 并不会跟随符号链接。
+*/
+
+//eg
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int main()
+{
+    struct stat buf;
+    if (stat("bar",&buf) < 0) {
+        printf("stat error for bar");
+        exit(EXIT_FAILURE);
+    }
+    if (chmod("bar",(buf.st_mode | S_IRWXG)) < 0) {
+        printf("chmod error for bar");
+        exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+}
+```
+
+### 粘着位
+
+`S_ISVTX`  允许针对目录设置粘着位。如果对一个目录设置了粘着位，只有对该目录具有写权限的用户并且满足下列条件之一，才能删除或重命名该目录下的文件。
+
+* 拥有此文件
+* 拥有此目录
+* 是超级用户
+
+`/tmp` 和 `/var/tmp` 是设置粘着位的典型候选者。任何用户都可在这两个目录中创建文件，任一用户对这两个目录的权限通常都是读、写和执行。但是用户不应能删除或重命名属于其他人的文件，为此在这两个目录的文件模式中都设置了粘着位。
+
+### 函数 chown、fchown、fchownat 和 lchown
+
+只有超级用户才能更改一个文件的所有者。
+
+```c
+#include <unistd.h>
+
+  int chown(const char *pathname, uid_t owner, gid_t group);
+  int fchown(int fd, uid_t owner, gid_t group);
+  int fchownat(int fd, const char *pathname, uid_t owner, gid_t group, int flag);
+  int lchown(const char *pathname, uid_t owner, gid_t group);
+          //4个函数的返回值：若成功，返回0；若出错，返回-1
+```
+
+### 文件截断
+
+```c
+#include <unistd.h>
+  int truncate(const char *pathname, off_t length);
+  int ftruncate(int fd, off_t length);
+          //两个函数的返回值：若成功，返回0；若出错，返回-1
+  //这两个函数将一个现有文件长度截断位 length。
+```
+
+### 函数 link、linkat、unlink、unlinkat 和 remove
+
+```c
+#include <unistd.h>
+  int link(const char *existingpath, const char *newpath);
+  int linkat(int efd, const char *existingpath, int nfd, const char *newpath, int flag);
+          //两个函数的返回值：若成功，返回0；若出错，返回-1
+
+  int unlink(const char *pathname);
+  int unlinkat(int fd, const char *pathname, int flag);
+          //两个函数的返回值：若成功，返回0；若出错，返回-1
+  /*
+   只有当链接计数达到0时，该文件的内容才可能被删除。另一个条件也会阻止删除文件的内容：只要有进程打开了该文件，其内容也不能删除。关闭一个文件时，内核首先检查打开该文件的进程个数；如果这个计数达到0，内核再去检查其链接计数；如果计数也是0，那么就删除该文件的内容。
+  */
+
+#include <stdio.h>
+  int remove(const char *pathname);
+          //返回值：若成功，返回0；若出错，返回-1
+```
+
+### 函数 rename 和 renameat
+
+```c
+#include <stdio.h>
+  int rename(const char *oldname, const char *newname);
+  int renameat(int oldfd, const char *oldname, int newfd, const char *newname);
+            //两个函数的返回值：若成功，返回0；若出错，返回-1
+```
 
