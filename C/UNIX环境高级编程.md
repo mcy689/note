@@ -793,3 +793,86 @@ int main()
 }
 ```
 
+### 二进制I/O
+
+```c
+#include <stdio.h>
+  size_t fread(void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp);
+  size_t fwrite(const void *restrict ptr, size_t size, size_t nobj, FILE *restrict fp);
+              //两个函数的返回值：读或写的对象数
+  //buffer为接收数据的地址，size为一个单元的大小，count为单元个数，stream为文件流。
+
+/*
+ eg：用法
+   1. 读或写一个二进制数组。例如，为了将一个浮点数组的第 2～5 个元素写至一个文件上。
+    float data[10];
+    if (fwrite(&data[2],sizeof(float),4,fp) != 4) {
+      err_sys("fwrite error");
+    }
+   2. 读或写一个结构
+     struct {
+       short count;
+       long total;
+       char name[NAMESIZE];
+     } item;
+     if (fwrite(&item,sizeof(item),1,fp) != 1) {
+       err_sys("fwrite error");
+     }
+*/ 
+```
+
+### 定位流
+
+对于一个二进制流文件，其文件位置指示器是从文件起始位置开始度量，并以**字节为度量单位** 的。
+
+对于文本文件，它们的文件当前位置可能不以简单的字节偏移量来度量。
+
+```c
+#include <stdio.h>
+  long ftell(FILE *fp);
+              //返回值：若成功，返回当前文件位置指示；若出错，返回 -1L
+  int fseek(FILE *fp, long offset, int whence);
+              //返回值：若成功，返回0；若出错，返回-1
+  void rewind(FILE *fp);
+/*
+  whence
+    SEEK_SET 表示文件的开始位置
+    SEEK_CUR 表示从当前文件位置开始
+    SEEK_END 表示从文件尾端开始
+
+  rewind 函数可以将一个流设置到文件的起始位置
+*/
+
+  off_t ftello(FILE *fp);
+              //返回值：若成功，返回当前文件位置；若出错，返回 (off_t)-1
+  int fseeko(FILE *fp, off_t offset, int whence);
+              //返回值：若成功，返回0；若出错，返回-1
+
+  int fgetpos(FILE *restrict fp, fpos_t *restrict pos);
+  int fsetpos(FILE *fp, const fpos_t *pos);
+              //两个函数返回值：若成功，返回0；若出错，返回非0
+  /*
+    fgetpos 将文件位置指示器的当前值存入由pos指向的对象中。以后调用 fsetpos 时，可以使用此值将流重新定位至该位置。
+  */
+
+//eg:获取文件总长度
+#include <stdio.h>
+
+int main()
+{
+    FILE *fp;
+    long len;
+
+    fp = fopen("file.txt","r");
+    if (fp == NULL) {
+        perror("打开文件错误");
+        return -1;
+    }
+    fseek(fp,0,SEEK_END);
+    len = ftell(fp);
+    fclose(fp);
+    printf("file.txt 的总大小=%ld 字节\n",len);
+    return 0;
+}
+```
+
