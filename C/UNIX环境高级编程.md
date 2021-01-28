@@ -876,3 +876,57 @@ int main()
 }
 ```
 
+### 格式化I/O
+
+```c
+#include <stdio.h>
+  int printf(const char *restrict format, ...);
+  int fprintf(FILE *restrict fp, const char *restrict format, ...);
+  int dprintf(int fd, const char *restrict format, ...);
+            //3个函数返回值：若成功，返回输出字符数；若输出出错，返回负数
+  int sprintf(char *restrict buf, const char *restrict format, ...);
+            //返回值：若成功，返回存入数组的字符数；若编码出错，返回负数
+  int snprintf(char *restrict buf, size_t n, const char *restrict format, ...);
+            //返回值：若缓冲区足够大，返回将要存入数组的字符数；若编码出错，返回负值
+/*
+  printf 将格式化数据写到标准输出
+  fprintf 写至指定的流。
+  dprintf 写至指定的文件描述符。
+  sprintf 将格式化的字符送入数组 buf 中。sprintf 在该数组的尾端自动加一个 null 字节，但该字符不包括在返回值中。
+  
+  注意：
+    sprintf 函数可能会造成由 buf 指向的缓冲区的溢出。调用者有责任确保该缓冲区足够大。因为缓冲区溢出会造成程序不稳定甚至安全隐患。
+*/
+
+#include <stdio.h>
+  int scanf(const char *restrict format, ...);
+  int fscanf(FILE *restrict fp, const char *restrict format, ...);
+  int sscanf(const char *restrict buf, const char *restrict format, ...);
+            //3个函数返回值：赋值的输入项数；若输入出错或在任一转换前已到达文件尾端，返回EOF
+```
+
+### 根据流获取描述符
+
+```c
+#include <stdio.h>
+  int fileno(FILE *fp);
+            //返回值：与该流相关联的文件描述符
+```
+
+### 内存流
+
+```c
+#include <stdio.h>
+  FILE *fmemopen(void *restrict buf, size_t size, const char *restrict type);
+            //返回值：若成功，返回流指针；若出错，返回NULL
+  /*
+    fmemopen 函数允许调用者提供缓冲区用于内存流：buf 参数指向缓冲区的开始位置，size 参数指定了缓冲区大小的字节数。如果 buf 参数为空，fmemopen 函数分配 size 字节的缓冲区。在这种情况下，当流关闭时缓冲区会被释放。
+  */
+
+#include <stdio.h>
+  FILE *open_memstream(char **bufp,size_t *sizep);
+#include <wchar.h>
+  FILE *open_wmemstream(wchar_t **bufp, size_t *sizep);
+            //返回值：若成功，返回流指针；若出错，返回NULL
+```
+
