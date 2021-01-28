@@ -689,3 +689,107 @@ int main()
 
 ### 读写流
 
+```c
+//输入函数，以下3个函数可用于一次读一个字符
+  #include <stdio.h>
+    int getc(FILE *fp);
+    int fgetc(FILE *fp);
+    int getchar(void);
+              //3个函数的返回值：若成功，返回下一个字符，若已到达文件尾端或出错，返回EOF。
+    //getchar 等同于 getc(stdin); 
+
+//判断是否成功
+  #include <stdio.h>
+    int ferror(FILE *fp);
+    int feof(FILE *fp);
+              //两个函数返回值：若条件为真，返回非0，否则返回0
+    void clearerr(FILE *fp);
+    /*
+      在大多数实现中，为每个流在FILE对象中维护了两个标志：
+        出错标志
+        文件结束标志
+      调用 clearerr 可以清除这两个标志。
+    */
+
+//将字符再压送回流中。
+  #include <stdio.h>
+    int ungetc(int c, FILE *fp);
+              //返回值：若成功，返回c；若出错，返回 EOF
+
+//写函数
+  #include <stdio.h>
+    int putc(int c, FILE *fp);
+    int fputc(int c, FILE *fp);
+    int putchar(int c);
+              //3个函数返回值：若成功；返回c；若出错，返回EOF
+    //putchar(c) 等同于 putc(c, stdout);
+```
+
+### 每次一行I/O
+
+```c
+#include <stdio.h>
+  char *fgets(char *restrict buf, int n,FILE *restrict fp);
+  char *gets(char *buf);//（不推荐使用）
+              //两个函数返回值：若成功，返回buf；若已到达文件尾端或出错，返回NULL。
+/*
+  fgets，
+    必须指定缓冲的长度n，此函数一直读到下一个换行符为止，但是不超过 n-1 个字符，读入的字符被送入缓冲区。
+    该缓冲区以 null 字节结尾。
+    若该行包括最后一个换行符的字符数超过 n-1，则 fgets 只返回一个不完整的行。但是，缓冲区总是以 null 字节结尾。对 fgets 的下次调用回继续该行读。
+    
+*/
+
+//fgets
+  #include <stdio.h>
+
+  int main()
+  {
+      char str[30];
+      printf("输入一个字符串：");
+      fgets(str,7,stdin);
+      printf("%s\n",str);
+      fgets(str,7,stdin);
+      printf("%s\n",str);
+      return 0;
+  }
+/*
+  machunyudeMacBook-Pro:example machunyu$ ./5_3_prit 
+  输入一个字符串：i love you
+  i love
+   you
+*/
+
+#include <stdio.h>
+  int fputs(const char *restrict str, FILLE *restrict fp);
+  int puts(const char *str);
+              //两个函数返回值：若成功，返回非负值，若出错，返回EOF。
+/*
+  区别
+    1. puts() 只能向标准输出流输出，而 fputs() 可以向任何流输出。
+    2. 使用 puts() 时，系统会在自动在其后添加换行符；而使用 fputs()时，系统不会自动添加换行符号。
+*/
+
+//eg。复制输入流到输出流
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAXLINE 30
+
+int main()
+{
+    char buf[MAXLINE];
+    while (fgets(buf, MAXLINE, stdin) != NULL) {
+        if (fputs(buf, stdout) == EOF) {
+            printf("output error");
+            exit(EXIT_FAILURE);
+        }
+    }
+    if (ferror(stdin)) {
+        printf("input error");
+        exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+}
+```
+
