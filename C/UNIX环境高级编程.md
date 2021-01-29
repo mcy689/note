@@ -1057,3 +1057,214 @@ int main(int argc, char *argv[]);
 */
 ```
 
+### 进程的终止
+
+5种正常终止方式
+
+1. 从 main 返回。
+2. 调用 exit。
+3. 调用 `_exit` 和 `_Exit`。
+4. 最后一个线程从其启动例程返回。
+5. 从最后一个线程调用 pthread_exit。
+
+3种异常方式
+
+1. 调用 abort。
+2. 接到一个信号。
+3. 最后一个线程对取消请求做出响应。
+
+```c
+//退出函数
+  #include <stdlib.h>
+    void exit(int status);
+    void _Exit(int status);
+  #include <unistd.h>
+    void _exit(int status);
+  /*
+    1. _exit 和 _Exit 立即进入内核。
+    2. exit 则先执行一些清理处理，然后返回内核。对于所有打开流调用 fclose 函数。这造成输出缓冲中的所有数据都被冲洗（写到文件上）。
+  */
+
+//函数 atexit，
+  #include <stdlib.h>
+    int atexit(void (*func) (void));
+            //返回值：若成功，返回0；若出错，返回-1
+	/*
+	 1. 按照 ISO C 规定，一个进程可以登记多至 32 个函数，这些函数将由 exit 自动调用。
+	 2. exit 调用这些函数的顺序与它们登记时候的顺序相反。
+	 3. 同一个函数如若登记多次，也会被调用多次。
+	*/
+
+//eg:atexit
+  #include <stdio.h>
+  #include <stdlib.h>
+
+  void bye(void)
+  {
+      printf("That was all,folks\n");
+  }
+  int main()
+  {
+      atexit(bye);
+      exit(EXIT_SUCCESS);
+  }
+```
+
+![c程序启动和终止](./image/c程序启动和终止.png)
+
+### 命令行参数
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[])
+{
+    int i;
+    for (i = 0; i < argc; i++) {
+        printf("argv[%d]:%s\n", i, argv[i]);
+    }
+    exit(0);
+}
+```
+
+### 环境表
+
+每个程序都接收到一张环境表。环境表也是一个字符指针数组，其中每个指针包含一个以 null 结束的 C 字符串的地址。全局变量 `environ` 则包含了该指针数组的地址。
+
+```c
+extern char **environ;
+```
+
+### C 程序的存储空间布局
+
+1. 正文段。这是由 CPU 执行的机器指令部分。通常，正文段是可共享的。
+
+2. 初始化数据段。通常将此段数据段，它包含了程序中需要明确地赋初值的变量。例如，C 程序中任何函数之外的声明。
+
+   ```c
+   int maxcount = 99;
+   ```
+
+3. 未初始化数据段。通常将此段成为 bss 段，在程序开始执行之前，内核将此段中的数据初始化为0或者空指针。函数外的声明
+
+   ```c
+   long sum[1000];
+   ```
+
+4. 栈。自动变量以及每次函数调用时所需保存的信息都存放在此段中。
+
+5. 堆。通常在堆中进行动态存储分配。堆位于未初始化数据段和栈之间。
+
+<img src="./image/典型的存储空间.png" alt="典型的存储空间" style="zoom:50%;" />
+
+### 存储空间分配
+
+```c
+#include <stdlib.h>
+  void *malloc(size_t size);
+  void *calloc(size_t nobj, size_t size);
+  void *realloc(void *ptr, size_t newsize);
+            //3个函数返回值：若成功，返回非空指针；若出错，返回 NULL
+  void free(void *ptr);
+  /*
+    1. malloc，分配指定字节数的存储区。此存储区中的初始值不确定。
+    2. calloc，为指定数量指定长度的对象分配存储空间。该空间中的每一位（bit）都初始化为0。
+    3. realloc，增加或减少以前分配区的长度。当增加长度时，可能需将以前分配区的内容移到另一个足够大的区域，以便在尾端提供增加的存储区，而新增区域的初始值则不确定。
+  */
+```
+
+### 环境变量
+
+```c
+//获取环境信息
+  #include <stdlib.h>
+    char *getenv(const char *name);
+              //返回值：指向与 name 关联的 value 的指针；若未找到，返回 NULL
+  /*
+      此函数返回一个指针，它指向 name=value 字符串中的value。
+   */
+
+//修改环境变量
+ #include <stdlib.h>
+    int putenv(char *str);
+              //函数返回值：若成功，返回0；若出错，返回非0
+    int setenv(const char *name, const char *value, int rewrite);
+    int unsetenv(const char *name);
+              //两个函数返回值：若成功，返回0；若出错，返回-1
+    /*
+     1. putenv 取形式为 name=value 字符串，将其放到环境表中。如果 name 已经存在，则先删除其原来的定义。
+     2. setenv 将 name 设置为 value。如果在环境中 name 已经存在，那么
+         rewrite 非0，则首先删除其现有的定义
+         rewrite 为0，则不删除其现有定义（name 不设置为新的value，而且也不出错）。
+     3. unsetenv 删除 name 的定义。即使不存在这种定义也不算出错。
+    */
+```
+
+### 函数 setjmp 和 longjmp
+
+```c
+#include <setjmp.h>
+  int setjmp(jmp_buf env);
+              //返回值：若直接调用，返回0；若从 longjmp 返回，则非0
+  void longjmp(jmp_buf env, int val);
+	/*
+	直接调用 setjmp 函数，其返回值为0。setjmp 参数 env 的类型是一个特殊类型 jmp_buf。这一数据类型是某种形式的数组，其中存放在调用 longjmp 时能用来恢复栈状态的所有信息。因为需在另一个函数中引用 env 变量，所以通常将 env 变量定义为全局变量。
+	*/
+
+//eg
+#include <setjmp.h>
+#include <stdio.h>
+
+static jmp_buf env;
+double divide(double to, double by) {
+    if (by == 0) {
+        longjmp(env,1);
+    }
+    return to/by;
+}
+void f()
+{
+    if (setjmp(env) == 0) {
+        divide(2,0);
+    } else {
+        printf("Cannot / 0\n");
+    }
+}
+int main()
+{
+    f();
+}
+```
+
+**自动变量的潜在问题** 
+
+```c
+#include <stdio.h>
+
+FILE *open_data(void)
+{
+  FILE *fp;
+  char databuf[BUFSIZ]; /* setvbuf makes this the stdio buffer */
+  if ((fp = fopen("datafile","r")) == NULL) {
+    return (NULL);
+  }
+  if (setvbuf(fp,databuf,_IOLBF,BUFSIZ) != 0) {
+    return (NULL);
+  }
+  return (fp);
+}
+/*
+  当 open_data 返回时，它在栈上所使用的空间将由下一个被调用函数的栈帧使用。但是，标准 I/O 库函数任然使用这部分存储空间作为该流的缓冲区。这就产生了冲突和混乱。为了更正这一问题，应在全局存储空间静态地（static或extern）或者动态（使用一种alloc函数）为数组 databuf 分配空间。
+*/
+```
+
+### 函数 getrlimit 和 setrlimit
+
+```c
+#include <sys/resource.h>
+  int getrlimit(int resource, struct rlimit *rlptr);
+  int setrlimit(int resource, const struct rlimit *rlptr);
+              //两个函数返回值：若成功，返回0；若出错，返回非0
+```
+
