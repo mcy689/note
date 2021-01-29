@@ -930,3 +930,130 @@ int main()
             //返回值：若成功，返回流指针；若出错，返回NULL
 ```
 
+## 系统数据文件和信息
+
+### 口令文件
+
+`passwd` 结构通常是函数内部的静态变量，只要调用任一相关函数，其内容就会被重写。
+
+```c
+#include <pwd.h>
+  struct passwd *getpwuid(uid_t uid);
+  struct passwd *getpwnam(const char *name);
+            //两个函数返回值：若成功，返回指针；若出错，返回 NULL
+
+//eg
+  #include <pwd.h>
+  #include <stdio.h>
+
+  int main()
+  {
+     struct passwd *user;
+     if((user = getpwuid(1001)) == NULL){
+        perror("getpwuid error");
+        return -1;
+      }
+      printf("%s\n",user->pw_name);
+      return 0;
+  }
+
+  struct passwd *getpwent(void);
+            //两个函数返回值：若成功，返回指针；若出错，返回 NULL
+  void setpwent(void);
+  void endpwent(void);
+  /*
+    getpwent 打开文件
+    setpwent 用来将getpwent()的读写地址指回密码文件开头。
+    endpwent 关闭文件
+  */
+
+//eg：实现的 getpwnam 函数
+#include <pwd.h>
+#include <stdio.h>
+#include <string.h>
+
+struct passwd *getpwnam(const char *name)
+{
+    static struct passwd *ptr;
+    setpwent();
+    while ((ptr = getpwent()) != NULL) {
+        if (strcmp(name, ptr->pw_name) == 0) {
+            break;
+        }
+    }
+    endpwent();
+    return (ptr);
+}
+
+int main()
+{
+    struct passwd *user;
+    if((user = getpwnam("machunyu")) == NULL){
+        perror("getpwuid error");
+        return -1;
+    }
+    printf("%s--%d\n",user->pw_name,user->pw_uid);
+    return 0;
+}
+```
+
+### 阴影口令
+
+加密口令是经单向加密算法处理过的用户口令副本。因为此算法是单向的，所以不能从加密口令猜测到原来的口令。
+
+```c
+#include <shadow.h>
+  struct spwd *getspnam(const char *name);
+  struct spwd *getspent(void);
+            //两个函数返回值：若成功，返回指针；若出错，返回 NULL。
+  void setspent(void);
+  void endspent(void);
+```
+
+### 组文件
+
+```c
+#include <grp.h>
+
+  struct group *getgrgid(gid_t gid);
+  struct group *getgrnam(const char *name);
+            //两个函数返回值：若成功，返回指针；若出错，返回 NULL。
+/*
+  这两个函数通常也返回指向一个静态变量的指针，在每次调用时都重写该静态变量。
+*/
+
+  struct group *getgrent(void);
+            //返回值：若成功，返回指针；若出错或到达文件尾端，返回 NULL。
+  void setgrent(void);
+  void endgrent(void);
+```
+
+### 附属组(?)
+
+```c
+#include <unistd.h>
+  int getgroups(int gidsetsze, gid_t grouplist[]);
+            //返回值：若成功，返回附属组ID数量，若出错，返回-1
+
+#include <grp.h>
+#include <unistd.h>
+  int setgroups(int ngroups, const gid_t grouplist[]);
+
+#include <grp.h>
+#include <unistd.h>
+  int initgroups(const char *username, gid_t basegid);
+            //两个函数的返回值：若成功，返回0；若出错，返回-1
+```
+
+## 进程环境
+
+### main函数
+
+```c
+int main(int argc, char *argv[]);
+/*
+  argc 命令行参数的数目
+  argv 指向参数的各个指针所构成的数组
+*/
+```
+
