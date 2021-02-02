@@ -265,9 +265,43 @@ int main()
   */
 
 #include <unistd.h>
+  int setreuid(uid_t ruid, uid_t euid);
+  int setregid(gid_t rgid, gid_t egid);
+            //两个函数返回值：若成功，返回0；若出错，返回-1
+  /*
+   1. 交换实际用户ID和有效用户ID的值
+   2. 一个非特权用户总能交换实际用户ID和有效用户ID。这就允许一个设置用户ID程序交换成用户的普通权限，以后又可再次交换回设置用户ID权限。
+  */
+
+#include <unistd.h>
   int seteuid(uid_t uid);
   int setegid(gid_t gid);
             //两个函数返回值：若成功，返回0；若出错，返回-1
-  //只更改有效用户ID和有效组ID
+  /*
+    1. 只更改有效用户ID和有效组ID
+    2. 一个非特权用户可将其有效用户ID设置为其实际用户ID或其保存的设置用户ID。
+    3. 对于一个特权用户则可将有效用户ID设置为 uid。
+  */
+```
+
+内核所维护的3个用户ID：
+
+1. 只有超级用户进程可以更改实际用户ID。通常，实际用户ID是在用户登录时，由 login 程序设置的，而且决不会改变它，因为 login 是一个超级用户进程，当它调用 setuid 时，设置所有3个用户ID。
+2. 仅当对程序文件设置了设置用户ID位时，`exec`  函数才设置有效用户ID。如果设置用户ID位没有设置，`exec ` 函数不会改变有效用户ID，而将维持其现有值。任何时候都可以调用 `setuid` ，将有效用户ID设置为实际用户ID或保存的设置用户ID。
+3. 保存的设置用户ID是由 exec 复制有效用户ID而得到的。如果设置了文件的设置用户ID位，则在 exec 根据文件的用户ID设置了进程的有效用户ID以后，这个副本就被保存起来了。
+
+![更改3个用户ID的不同方法](./image/更改3个用户ID的不同方法.png)
+
+### 函数 system
+
+```c
+#include <stdlib.h>
+  int system(const char *cmdstring);
+  /*
+    因为 system 在实现中调用了 fork、exec 和 waitpid，因此有3种返回值。
+     1. fork 失败或者 waitpid 返回除 EINTR 之外的错误，则 system 返回-1，并且设置 errno 以指示错误类型。
+     2. 如果 exec 失败（表示不能执行shell），则其返回值如果shell 执行了 exit(127) 一样。
+     3. 否则所有3个函数（fork、exec和waitpid）都成功，那么system的返回值是 shell 的终止状态。
+  */
 ```
 
