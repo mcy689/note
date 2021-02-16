@@ -368,3 +368,91 @@ int main()
 
 信号是软件中断，很多比较重要的应用程序都需处理信号。信号提供了一种处理异步事件的方法。
 
+### 函数 signal
+
+```c
+#include <signal.h>
+  void (*signal(int signo, void (*func)(int))) (int);
+            //返回值：若成功，返回以前的信号处理配置；若出错，返回 SIG_ERR
+/*
+  func 的值是常量 SIG_IGN、常量 SIG_DFL 或当接到此信号后要调用的函数地址。
+    SIG_IGN 则向内核表示忽略此信号（SIGKILL和SIGSTOP不能忽略）
+    SIG_DFL 则表示接到此信号后的动作是系统默认动作。
+    当指定函数地址时，则在信号发生时，调用该函数，我们称这种处理为捕捉该信号。称此函数为信号处理程序或者信号捕捉函数。
+  
+  signal 函数，返回一个函数指针，而该指针所指向的函数无返回值 (void)。该函数有一个整型参数(即最后的(int))。
+*/
+
+//eg
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+static void sig_usr(int);
+
+int main(void)
+{
+    if (signal(SIGUSR1, sig_usr) == SIG_ERR) {
+        printf("can't catch SIGUSR1");
+        exit(EXIT_FAILURE);
+    }
+    if (signal(SIGUSR2, sig_usr) == SIG_ERR) {
+        printf("can't catch SIGUSR2");
+        exit(EXIT_FAILURE);
+    }
+    for (;;) {
+        pause();
+    }
+}
+
+static void sig_usr(int signo) {
+    if (signo == SIGUSR1) {
+        printf("received SIGUSR1\n");
+    } else if (signo == SIGUSR2) {
+        printf("received SIGUSR2\n");
+    } else {
+        printf("received signal %d\n", signo);
+    }
+}
+/*
+  向进程发送信号
+    kill -USR1 9160
+    kill -USR2 9160
+*/
+```
+
+### 可重入函数
+
+进程捕捉到信号并对其进行处理时，进程正在执行的正常指令序列就被信号处理程序临时中断，它首先执行该信号处理程序中的指令。如果从信号处理程序返回（例如没有调用 exit 或 longjmp），则继续执行在捕捉到信号时进程正在执行的正常指令序列。但在信号处理程序中，不能判断捕捉到信号时进程执行到何处。
+
+`Single UNIX Specification` 说明了在信号处理程序中保证调用安全的函数。这些函数是可重入的并被称为是**异步信号安全的** 。具体函数看 `第10章10.6节`
+
+不安全的原因
+
+* 已知它们使用静态数据结构。
+* 它们调用 malloc 或者 free。
+* 它们是标准 I/O 函数，标准 I/O 库的很多实现都以不可重入方式使用全局数据结构。
+
+### 函数 kill 和 raise
+
+kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向自身发送信号。
+
+```c
+#include <signal.h>
+  int kill(pid_t pid, int signo);
+  int raise(int signo);
+            //两个函数返回值：若成功，返回0；若出错，返回-1
+  /*
+    1. 调用 raise(signo) 等价于调用 kill(getpid(),signo);
+    2. kill 的 pid 参数有以下 4 种不同的情况
+      pid > 0，将该信号发送给进程 ID 为 pid 的进程。
+      pid == 0，将该信号发送给与发送进程属于同一进程组的所有进程（这些进程的进程组 ID 等于发送进程的进程组ID），而且发送进程具有权限向这些进程发送信号。这里用的术语“所有进程”不包括实现定义的系统进程集。对于大多数 UNIX 系统，系统进程集包括内核进程和 init（pid为1）。
+      pid < 0，将该信号发送给其进程组ID等于 pid 绝对值，而且发送进程具有权限向其发送信号的所有进程。
+      pid == -1，将该信号发送给发送进程有权限向它们发送信号的所有进程。
+    3. 进程将信号发送给其他进程需要权限。超级用户可将信号发送给任一进程。对于非超级用户，其基本规则是发送者的实际用户 ID 或有效用户 ID 必须等于接收者的实际用户ID或者有效用户ID。
+  */
+```
+
+
+
