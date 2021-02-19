@@ -454,5 +454,84 @@ kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向
   */
 ```
 
+### 函数 alarm 和 pause
 
+使用 alarm 函数可以设置一个定时器（闹钟时间），在将来的某个时刻该定时器会超时。当定时器超时时，产生 SIGALRM 信号。如果忽略或不捕捉此信号，则其默认动作是终止调用该 alarm 函数的进程。
+
+```c
+#include <unistd.h>
+  unsigned int alarm(unsigned int seconds);
+            //返回值：0或以前设置的闹钟时间的余留秒数
+  int pause(void);
+            //返回值：-1，errno设置为EINTR
+  /*
+    alarm 参数 seconds 的值是产生信号 SIGALRM 需要经过的时钟秒数。
+    pause 函数只有执行了一个信号处理程序并从其返回时，pause 才返回。在这种情况下，pause 返回-1。
+  */
+
+//eg
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+
+  static void sig_alrm(int signo) {}
+
+  unsigned int sleep1(unsigned int seconds) //模拟 sleep 函数
+  {
+      if (signal(SIGALRM, sig_alrm) == SIG_ERR) {
+          return seconds;
+      }
+      alarm(seconds);
+      pause();
+      return (alarm(0));
+  }
+
+//alarm 还常用于对可能阻塞的操作设置时间上限制。例如，程序中有一个读低速设备的可能阻塞的操作，我们希望超过一定时间量就停止执行该操作。
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <unistd.h>
+
+  #define	MAXLINE	4096
+
+  static void sig_alrm(int);
+
+  int main()
+  {
+      int n;
+      char line[MAXLINE];
+      if (signal(SIGALRM,sig_alrm) == SIG_ERR) {
+          printf("signal(SIGALRM) error");
+          exit(EXIT_FAILURE);
+      }
+      alarm(10);
+      if ((n = read(STDIN_FILENO,line,MAXLINE)) < 0) {
+          printf("read error");
+          exit(EXIT_FAILURE);
+      }
+      alarm(0);
+      write(STDOUT_FILENO,line,n);
+      exit(0);
+  }
+  static void sig_alrm(int signo) {}
+```
+
+## 线程
+
+### 线程标识
+
+线程ID 是用 pthread_t 数据类型来表示的，实现的时候可以用一个结构来代表 pthread_t 数据类型，所以可移植的操作系统实现不能把它作为整数处理。
+
+```c
+#include <pthread.h>
+  int pthread_equal(pthread_t tid1,pthread_t tid2);
+            //返回值：若相等，返回非0数值；否则，返回0
+  pthread_t pthread_self(void);
+            //返回值：调用线程的线程ID
+  /*
+    pthread_equal 来对比两个线程 ID 进行比较。
+    pthread_self 获取自身的线程 ID。
+  */
+```
+
+### 线程创建
 
