@@ -535,3 +535,135 @@ kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向
 
 ### 线程创建
 
+```c
+#include <pthread.h>
+  int pthread_create(pthread_t *restrict tidp, const pthread_attr_t *restrict attr, void *(*start_rtn)(void *), void *restrict arg);
+            //返回值：若成功，返回0；否则，返回错误编号
+  /*
+    1. 当 pthread_create 成功返回时，新创建线程的线程ID会被设置成 tidp 指向的内存单元。 
+    2. attr 参数用于定制各种不同的线程属性。
+    3. 新创建的线程从 start_rtn 函数的地址开始运行，该函数只有一个无类型指针参数 arg。
+  */
+
+//eg
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <pthread.h>
+  #include <unistd.h>
+
+  pthread_t ntid;
+
+  void printids(const char *s)
+  {
+      pid_t pid;
+      pthread_t tid;
+
+      pid = getpid();
+      tid = pthread_self();
+      printf("%s pid %lu tid %lu (0x%lx)\n", s, (unsigned long)pid, (unsigned long)tid, (unsigned long)tid);
+  }
+
+  void *thr_fn(void *arg)
+  {
+      printids("new thread: ");
+      return ((void *)0);
+  }
+
+  int main(void)
+  {
+      int err;
+      err = pthread_create(&ntid, NULL, thr_fn, NULL);
+      if (err != 0)
+      {
+          printf("cant't creat thread");
+          exit(EXIT_FAILURE);
+      }
+      printids("main thread:");
+      sleep(1);
+      exit(0);
+  }
+```
+
+### 线程终止
+
+如果进程中的任意线程调用了 `exit`、`_Exit` 或者 `_exit` ，那么整个进程就会终止。与此相类似，如果默认的动作是终止进程，那么，发送到线程的信号就会终止整个进程。
+
+单个线程可以通过 3 种方式退出。因此可以在不终止整个进程的情况下，停止它的控制流。
+
+1. 线程可以简单地从启动例程中返回，返回值是线程的退出码。
+2. 线程可以被同一进程中的其他线程取消。
+3. 线程调用 `pthread_exit` 。
+
+```c
+#include <pthread.h>
+  void pthread_exit(void *rval_ptr);
+  /*
+    rval_ptr 参数是一个无类型指针，与传给启动例程的单个参数类似。进程中的其他线程也可以通过调用 pthread_join 函数访问到这个指针。
+  */
+  int pthread_join(pthread_t thread, void **rval_ptr);
+  /*
+    1. 调用线程将一直阻塞，直到指定的线程调用 pthread_exit、从启动例程中返回或者被取消。如果线程简单地从它的启动例程返回，rval_ptr 就包含返回码。如果线程被取消，由 rval_ptr 指定的内存单元就设置为 PTHREAD_CANCELED。
+    2. 如果对线程的返回值并不感兴趣，那么可以把 rval_ptr 设置为 NULL。在这种情况下，调用 pthread_join 函数可以等待指定的线程终止，但并不获取线程的终止状态。
+  */
+
+//eg:获取已终止的线程的退出码
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <pthread.h>
+  #include <unistd.h>
+
+  void *thr_fn1(void *arg)
+  {
+      printf("thread 1 exiting \n");
+      pthread_exit((void *)1);
+  }
+
+  void *thr_fn2(void *arg)
+  {
+      printf("thread 2 exiting \n");
+      pthread_exit((void *)2);
+  }
+
+  int main()
+  {
+      int err;
+      pthread_t tid1, tid2;
+      void *tret;
+
+      err = pthread_create(&tid1, NULL, thr_fn1, NULL);
+      if (err != 0)
+      {
+          perror("can't create thread 1");
+          exit(EXIT_FAILURE);
+      }
+      err = pthread_create(&tid2, NULL, thr_fn2, NULL);
+      if (err != 0)
+      {
+          perror("can't create thread 2");
+          exit(EXIT_FAILURE);
+      }
+      err = pthread_join(tid1, &tret);
+      if (err != 0)
+      {
+          perror("can't join with thread 1");
+          exit(EXIT_FAILURE);
+      }
+      printf("thread 1 exit code %ld\n", (long)tret);
+      err = pthread_join(tid2, &tret);
+      if (err != 0)
+      {
+          perror("can't join with thread 2");
+          exit(EXIT_FAILURE);
+      }
+      printf("thread 1 exit code %ld\n", (long)tret);
+      exit(0);
+  }
+/*
+ *运行结果
+  thread 2 exiting 
+  thread 1 exiting 
+  thread 1 exit code 1
+  thread 2 exit code 2
+*/
+```
+
