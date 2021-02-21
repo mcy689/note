@@ -600,11 +600,30 @@ kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向
   /*
     rval_ptr 参数是一个无类型指针，与传给启动例程的单个参数类似。进程中的其他线程也可以通过调用 pthread_join 函数访问到这个指针。
   */
+
   int pthread_join(pthread_t thread, void **rval_ptr);
+            //返回值：若成功，返回0；否则，返回错误编号
   /*
     1. 调用线程将一直阻塞，直到指定的线程调用 pthread_exit、从启动例程中返回或者被取消。如果线程简单地从它的启动例程返回，rval_ptr 就包含返回码。如果线程被取消，由 rval_ptr 指定的内存单元就设置为 PTHREAD_CANCELED。
     2. 如果对线程的返回值并不感兴趣，那么可以把 rval_ptr 设置为 NULL。在这种情况下，调用 pthread_join 函数可以等待指定的线程终止，但并不获取线程的终止状态。
+    3. pthread_create 和 pthread_exit 函数的无类型指针参数可以传递的值不止一个，这个指针可以传递包含复杂信息的结构的地址。但注意，这个结构所使用的内存在调用者完成调用以后必须仍然是有效的。
   */
+
+  int pthread_cancel(pthread_t tid);
+            //返回值：若成功，返回0；否则，返回错误编号
+  /*
+    线程可以通过调用 pthread_cancel 函数来请求取消同一进程中的其他线程。注意 pthread_cancel 并不等待线程终止，它仅仅提出请求。
+   */
+
+  void pthread_cleanup_push(void (*rtn)(void *), void *arg);
+  void pthread_cleanup_pop(int execute);
+	/*
+	  1. 线程可以安排它退出时需要调用的函数，这样的函数称为线程清理处理程序。一个线程可以建立多个清理处理程序。处理程序记录在栈中，也就是说，它们的执行顺序与它们注册时相反。
+	  2. 当线程执行一下动作时，清理函数 rtn 是由 pthread_cleanup_push 函数调度的，调用时只有一个参数 arg：
+	    1. 调用 pthread_exit 时。
+	    2. 响应取消请求时。
+	    3. 用非零 execute 参数调用 pthread_cleanup_pop 时
+	*/
 
 //eg:获取已终止的线程的退出码
   #include <stdio.h>
@@ -666,4 +685,134 @@ kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向
   thread 2 exit code 2
 */
 ```
+
+### 线程同步
+
+#### 互斥量
+
+```c
+#include <pthread.h>
+  int pthread_mutex_init(pthread_mutex_t *restrict mutex, const pthread_mutexattr_t * restrict attr);
+  int pthread_mutex_destroy(pthread_mutex_t *mutex);
+            //返回值：若成功，返回0；否则，返回错误编号
+/*
+  互斥变量是用 pthread_mutex_t 数据类型表示的。在使用互斥变量以前，必须首先对它进行初始化，可以把它设置为常量 PTHREAD_MUTEX_INITIALIZER (只适用于静态分配的互斥量)，也可以通过调用 pthread_mutex_init 函数进行初始化。如果动态分配互斥量（例如，通过调用 malloc 函数），在释放内存前需要调用 pthread_mutex_destroy。
+*/
+
+  int pthread_mutex_lock(pthread_mutex_t *mutex);
+  int pthread_mutex_trylock(pthread_mutex_t *mutex);
+  int pthread_mutex_unlock(pthread_mutex_t *mutex);
+            //返回值：若成功，返回0；否则，返回错误编号
+/*
+  1. 对互斥量进行加锁，需要调用 pthread_mutex_lock。如果互斥量已经上锁，调用线程将阻塞直到互斥量被解锁。对互斥量解锁，需要调用 pthread_mutex_unlock。
+  2. 如果线程不希望被阻塞，它可以使用 pthread_mutex_trylock 尝试对互斥量进行加锁。如果调用 pthread_mutex_trylock 时互斥量处于未锁住状态，那么 pthread_mutex_trylock 将锁住互斥量，不会出现阻塞直接返回0，否则 pthread_mutex_trylock 就会失败，不能锁住互斥量，返回 EBUSY。
+*/
+
+  int pthread_mutex_timedlock(pthread_mutex_t *restrict mutex, const struct timespec *restrict tsptr);
+            //返回值：若成功，返回0；否则，返回错误编号
+/*
+  当线程试图获取一个已加锁的互斥量时，pthread_mutex_timedlock 在达到超时时间值时，不会对互斥量进行加锁，而是返回错误码 ETIMEDOUT。
+*/
+
+//eg
+  #include <stdlib.h>
+  #include <pthread.h>
+
+  struct foo
+  {
+      int f_count;
+      pthread_mutex_t f_lock;
+      int f_id;
+  };
+
+  struct foo *foo_alloc(int id)
+  {
+      struct foo *fp;
+      if ((fp = malloc(sizeof(struct foo))) != NULL) {
+          fp->f_count = 1;
+          fp->f_id = id;
+          if (pthread_mutex_init(&fp->f_lock, NULL) != 0)
+          {
+              free(fp);
+              return (NULL);
+          }
+      }
+      return (fp);
+  }
+
+  void foo_hold(struct foo *fp)
+  {
+      pthread_mutex_lock(&fp->f_lock);
+      fp->f_count++;
+      pthread_mutex_unlock(&fp->f_lock);
+  }
+
+  void foo_rele(struct foo *fp)
+  {
+      pthread_mutex_lock(&fp->f_lock);
+      if (--fp->f_count == 0) {
+          pthread_mutex_unlock(&fp->f_lock);
+          pthread_mutex_destroy(&fp->f_lock);
+          free(fp);
+      } else {
+          pthread_mutex_unlock(&fp->f_lock);
+      }
+  }
+```
+
+#### 读写锁
+
+读写锁可以有3种状态：读模式下加锁状态，写模式下加锁状态，不加锁状态。
+
+读写锁非常适合于对数据结构读的次数远大于写的情况。
+
+```c
+#include <pthread.h>
+  int pthread_rwlock_init(pthread_rwlock_t *restrict rwlock, const pthread_rwlockattr_t *restrict attr);
+  int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
+
+  int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+  int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+  int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+
+  int pthread_rwlock_tryrdlock(pthread_rwlock_t *rwlock);
+  int pthread_rwlock_trywrlock(pthread_rwlock_t *rwlock);
+
+  int pthread_rwlock_timedrdlock(pthread_mutex_t *restrict rwlock, const struct timespec *restrict tsptr);
+  int pthread_rwlock_timedwrlock(pthread_mutex_t *restrict rwlock, const struct timespec *restrict tsptr);
+            //所以函数返回值：若成功，返回0；否则，返回错误编号
+```
+
+#### 条件变量
+
+与互斥锁不同，条件变量是用来等待而不是用来上锁的。条件变量用来自动阻塞一个线程，直到某特殊情况发生为止。通常条件变量和互斥锁同时使用。条件变量使我们可以睡眠等待某种条件出现。条件变量是利用线程间共享的全局变量进行同步的一种机制，主要包括两个动作：一个线程等待"条件变量的条件成立"而挂起；另一个线程使 “条件成立”（给出条件成立信号）。
+
+```c
+#include <pthread.h>
+  int pthread_cond_init(pthread_cond_t *restrict cond, const pthread_condattr_t *restrict attr);
+  int pthread_cond_destroy(pthread_cond_t *cond);
+
+  int pthread_cond_wait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex);
+  int pthread_cond_timedwait(pthread_cond_t *restrict cond, pthread_mutex_t *restrict mutex, const struct timespec *restrict tsptr);
+
+  int pthread_cond_signal(pthread_cond_t *cond);
+  int pthread_cond_broadcast(pthread_cond_t *cond);
+            //所以函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    pthread_cond_signal 函数至少能唤醒一个等待该条件的线程。
+    pthread_cond_broadcast 函数则能唤醒等待该条件的所有线程。
+  */
+```
+
+#### 自旋锁
+
+自旋锁与互斥量功能一样，唯一一点不同的就是互斥量阻塞后休眠让出cpu，而自旋锁阻塞后不会让出cpu，会一直忙等待，直到得到锁。
+
+自旋锁可用于以下情况：锁被持有的时间短，而且线程并不希望在重新调度上花费太多的成本。
+
+#### 屏障
+
+屏障是用户协调多个线程并行工作的同步机制。屏障允许每个线程等待，直到所有的合作线程都达到某一点，然后从该点继续执行。
+
+
 
