@@ -814,5 +814,149 @@ kill 函数讲信号发送给进程或进程组。raise 函数则允许进程向
 
 屏障是用户协调多个线程并行工作的同步机制。屏障允许每个线程等待，直到所有的合作线程都达到某一点，然后从该点继续执行。
 
+## 线程控制
 
+### 线程属性
+
+`pthread_attr_t` 结构修改线程默认属性，并把这些属性与创建的线程联系起来。
+
+详细`UNIX 环境高级编程12.3` 
+
+```c
+#include <pthread.h>
+  int pthread_attr_init(pthread_attr_t *attr);
+  int pthread_attr_destroy(pthread_attr_t *attr);
+            //所以函数返回值：若成功，返回0；否则，返回错误编号
+
+  int pthread_attr_getdetachstate(const pthread_attr_t *restrict attr, int *detachstate);
+  int pthread_attr_setdetachstate(pthread_attr_t *attr, int *detachstate);
+            //所以函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    如果在创建线程时就知道不需要了解线程的终止状态，就可以修改 pthread_attr_t 结构中的 detachstate 线程属性，让线程一开始就处于分离状态。可以使用 pthread_attr_setdetachstate 函数把线程属性 detachstate 设置成一下两个合法值之一：PTHREAD_CREATE_DETACHED，以分离状态启动线程；或者 PTHREAD_CREATE_JOINABLE，正常启动线程，应用程序可以获取线程的终止状态。
+  */
+
+//eg:以分离状态创建线程的函数
+  #include <pthread.h>
+
+  int makethread(void *(*fn)(void *), void *arg)
+  {
+      int err;
+      pthread_t tid;
+      pthread_attr_t attr;
+
+      err = pthread_attr_init(&attr);
+      if (err != 0) {
+          return (err);
+      }
+      err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+      if (err == 0) {
+          err = pthread_create(&tid, &attr, fn, arg);
+      }
+      pthread_attr_destroy(&attr);
+      return (err);
+  }
+```
+
+### 重入
+
+如果一个函数在相同的时间点可以被多个线程安全地调用，就称该函数是线程安全的。
+
+### 线程特定数据
+
+线程特定数据，也称为线程私有数据，是存储和查询某个特定线程相关数据的一种机制。
+
+线程模型促进了进程中数据和属性的共享。
+
+```c
+#include <pthread.h>
+  int pthread_key_create(pthread_key_t *keyp, void (*destructor)(void *));
+            //函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    在分配线程特定数据之前，需要创建与该数据关联的键名，这个键将用于获取对线程特定数据的访问。
+    除了创建键以外，pthread_key_create 可以为该键关联一个可选择的析构函数。当这个线程退出时，如果数据地址已经被置为非空值，那么析构函数就会被调用。
+    当线程调用 pthread_exit 或者线程执行返回，正常退出时，析构函数就会被调用，
+  */
+
+  int pthread_key_delete(pthread_key_t key);
+            //函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    对所有线程，我们都可以通过调用 pthread_key_delete 来取消键与线程特定数据值之间的关联关系。
+    调用 pthread_key_delete 并不会激活与键关联的析构函数。要释放任何与键关联的线程特定数据值的内存，需要在应用程序中采取额外的步骤。
+  */
+
+  pthread_once_t initflag = PTHREAD_ONCE_INIT;
+  int pthread_once(pthread_once_t *initflag, void (*initfn)(void));
+            //函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    initflag 必须是一个非本地变量（如全局变量或静态变量），而且必须初始化为 PTHREAD_ONCE_INIT
+    如果每个线程都调用 pthread_once，系统就能保证初始化例程 initfn 只被调用一次。创建键时避免出现冲突的一个正确方法如下:
+		void destructor(void *);
+    pthread_key_t key;
+    pthread_once_t init_done = PTHREAD_ONCE_INIT;
+    void thread_init(void)
+    {
+      err = pthread_key_create(&key, destructor);
+    }
+    int threadfunc(void *arg)
+    {
+      pthread_once(&init_done, thread_init);
+    }
+  */
+
+  void *pthread_getspecific(pthread_key_t key);
+            //返回值：线程特定数据值；若没有值与该键关联，返回 NULL
+  int pthread_setspecific(pthread_key_t key, const void *value);
+            //函数返回值：若成功，返回0；否则，返回错误编号
+  /*
+    键一旦创建以后，就可以通过调用 pthread_setspecific 函数把键和线程特定数据关联起来。可以通过 pthread_getspecific 函数获得线程特定数据的地址。
+    如果没有线程特定数据值与键关联，pthread_getspecific 将返回一个空指针，我们可以用这个返回值来确定是否需要调用 pthread_setspecific。
+  */
+
+//eg:线程安全 getenv 的兼容版本
+  #include <limits.h>
+  #include <string.h>
+  #include <pthread.h>
+  #include <stdlib.h>
+
+  #define MAXSTRINGSZ 4096
+
+  static pthread_key_t key;
+  static pthread_once_t init_done = PTHREAD_ONCE_INIT;
+  pthread_mutex_t env_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+  extern char **environ;
+
+  static void thread_init(void)
+  {
+      pthread_key_create(&key, free);
+  }
+
+  char *getenv(const char *name)
+  {
+      int i, len;
+      char *envbuf;
+
+      pthread_once(&init_done, thread_init);
+      pthread_mutex_lock(&env_mutex);
+      envbuf = (char *)pthread_getspecific(key);
+      if (envbuf == NULL) {
+          envbuf = malloc(MAXSTRINGSZ);
+          if (envbuf == NULL) {
+              pthread_mutex_unlock(&env_mutex);
+              return (NULL);
+          }
+          pthread_setspecific(key, envbuf);
+      }
+      len = strlen(name);
+      for (i = 0; environ[i] != NULL; i++) {
+          if ((strncmp(name, environ[i], len) == 0) && (environ[i][len] == '='))) {
+              strncpy(envbuf, &environ[i][len + 1], MAXSTRINGSZ - 1);
+              pthread_mutex_unlock(&env_mutex);
+              return (envbuf);
+          }
+      }
+      pthread_mutex_unlock(&env_mutex);
+      return (NULL);
+  }
+```
 
