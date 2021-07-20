@@ -124,7 +124,6 @@
 <summary><b>Golang</b></summary>
 
 * [学习笔记](Go/学习笔记.md)
-* [leetcode](Go/leetcode/)
 </details>
 
 <details>
