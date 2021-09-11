@@ -121,6 +121,7 @@
 * [学习笔记](Go/学习笔记.md)
 * [学习资料](Go/学习资料.md)
 * [nil类型整理](Go/nil.md)
+* [接口相关知识](Go/接口.md)
 * [leetcode](Go/leetcode)
 </details>
 
