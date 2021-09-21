@@ -101,7 +101,7 @@
    docker run -p 10022:22 -d sshd:centos /run.sh
    ```
 
-9. 使用镜像，本人（宿主）的 IP 地址`172.20.10.3` 。
+9. 登录新启动的容器，本人（宿主）的 IP 地址`172.20.10.3` 。
 
    ```bash
    ssh 172.20.10.3 -p 10022 -l root -i ~/.ssh/docker_root_rsa
