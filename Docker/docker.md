@@ -1,3 +1,7 @@
+## Docker 的概念
+
+1. 容器是 Docker 的另一个核心概念。简单来说，容器是镜像的一个运行实例。所不同的是，镜像是静态的只读文件，而容器带有运行时需要的可写文件层。
+
 ## 安装docker
 
 ```shell
@@ -120,5 +124,69 @@ Docker Hub 中有两种类型的仓库：用户仓库和顶层仓库。用户仓
 
 ```shell
 docker rmi
+```
+
+
+
+## 绑定目录
+
+```bash
+# 例子
+  docker run -d --name study -i -t --mount type=bind,src=/data,dst=/Users/machunyu/docker_dir centos  /bin/bash
+```
+
+## 容器的命令
+
+```html
+create
+start
+run
+wait
+logs
+
+停止容器
+  pause
+  stop
+
+启动容器
+  start
+  restart
+
+查看容器
+	ps
+  ps -a
+  ps -q
+
+进入容器
+	attach
+	exec
+
+删除容器
+  docker rm
+
+导出与导入
+	docker export -o test_for_run.tar study
+```
+
+## 端口映射与容器互联
+
+1. 允许映射容器内应用的服务端口到本地宿主主机。
+2. 互联机制实现多个容器间通过容器名来快速访问。
+3. -p (小写的)则可以指定要映射的端口，并且，在一 个 指定端口上只可以绑定 一 个容器。 支持的格式有 `IP:HosPort:ConainerPort` I` IP::ContainerPort` I `HostPort:ContainerPort`。
+
+### 映射地址
+
+```html
+1. 映射所有接口地址
+		docker run -d -p 5000:5000 raining/webapp py七hon app.py
+		此时默认会绑定本地所有接口上的 所有地址。多次使用-p标记可以绑定多个端口。例如:
+		docker run -d -p 5000:5000 -p 3000:80 training/webapp python app.py
+
+2. 映射到指定地址的指定端口
+		docker run -d -p 127.0.0.1:5000:5000 raining/webapp python app.py
+
+3. 映射到指定地址的任意端口
+		docker run -d -p 127.0.0.1::5000 training/webapp pyhon app.py
+
 ```
 
