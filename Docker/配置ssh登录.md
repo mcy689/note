@@ -13,7 +13,7 @@
 3. 登录到 `basic` 容器中
 
    ```bash
-   docker exec -it study /bin/bash
+   docker exec -it basic /bin/bash
    ```
 
 4. 安装以及配置ssh
@@ -60,7 +60,7 @@
      ssh-keygen -t rsa -b 2048 -f /root
      ```
 
-   * 将密钥公钥文件复制到 `~/.ssh` 文件中
+   * 将密钥公钥文件复制到 `~/.ssh` 文件夹中
 
      ```bash
      mkdir ~/.ssh
