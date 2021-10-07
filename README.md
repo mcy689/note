@@ -61,6 +61,7 @@
 * [复制](Redis/复制.md)
 * [优化](Redis/优化.md)
 * [命令行](Redis/命令行.md)
+* [认识协议](Redis/redis协议认识.md)
 * [源码](Redis/源码.md)
 </details>
 
