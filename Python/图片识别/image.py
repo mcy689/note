@@ -25,8 +25,8 @@ def readeOcr(fileName):
         return ()
     return result[0]
 
-
-path = os.path.dirname(os.getcwd())+os.sep+"images"+os.sep
+# 读取当前运行环境下的 images 文件夹下所有图片
+path = os.getcwd()+os.sep+"images"+os.sep
 if not os.path.exists(path):
     os.mkdir(path)
 nowPath = path+time.strftime('%Y-%m-%d', time.localtime(time.time()))+os.sep
