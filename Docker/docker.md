@@ -22,19 +22,19 @@ logs
   restart
 
 查看容器
-	ps
+  ps
   ps -a
   ps -q
 
 进入容器
-	attach
-	exec
+  attach
+  exec
 
 删除容器
   docker rm
 
 导出与导入
-	docker export -o test_for_run.tar study
+  docker export -o test_for_run.tar study
 ```
 
 ## 镜像命令
