@@ -312,22 +312,37 @@ logs
 
 ## 端口映射与容器互联
 
+场景：多个服务组件容器共同协作的情况。
+
 1. 允许映射容器内应用的服务端口到本地宿主主机。
 2. 互联机制实现多个容器间通过容器名来快速访问。
-3. -p (小写的)则可以指定要映射的端口，并且，在一 个 指定端口上只可以绑定 一 个容器。 支持的格式有 `IP:HosPort:ConainerPort` I` IP::ContainerPort` I `HostPort:ContainerPort`。
 
-### 映射地址
+### 端口映射实现容器访问
 
-```html
-1. 映射所有接口地址
-		docker run -d -p 5000:5000 raining/webapp py七hon app.py
-		此时默认会绑定本地所有接口上的 所有地址。多次使用-p标记可以绑定多个端口。例如:
-		docker run -d -p 5000:5000 -p 3000:80 training/webapp python app.py
+当容器中运行一些网络应用，要让外部访问这些应用时。
 
-2. 映射到指定地址的指定端口
-		docker run -d -p 127.0.0.1:5000:5000 raining/webapp python app.py
+1. `-P 大写` 标记表示随机一个本地端口到内部开放的网络端口。
+2. `-p 小写` 可以指定要映射的端口，并且，在一个指定端口上只可以绑定一个容器。支持的格式有 `IP:HosPort:ConainerPort` I ` IP::ContainerPort` I `HostPort:ContainerPort`。
 
-3. 映射到指定地址的任意端口
-		docker run -d -p 127.0.0.1::5000 training/webapp pyhon app.py
+```shell
+# -P 大写
+  #1. 启动 redis 服务
+    docker run --name redis -P -d redis:6.2.6
+  #2. 使用 docker ps 看到本地主机端口被映射到容器的 6379 端口
+
+# -p 小写
+  #1. 启动redis 服务
+    docker run --name redis -P -d redis:6.2.6
+    
+# 其他映射规则
+    # 1. 映射所有指定端口的所有地址
+      docker run --name redis -d -p 8888:6379 redis:6.2.6
+    # 2. 映射到指定地址的指定端口
+      docker run --name redis -d -p 127.0.0.1:8888:6379 redis:6.2.6
+    # 3. 映射到指定地址的任意端口
+      docker run --name redis -d -p 127.0.0.1:6379 redis:6.2.6
+
+# 查看映射端口配置
+  docker port 5763ac69b410
 ```
 
