@@ -38,7 +38,8 @@
        create 0644 root root
        sharedscripts
        postrotate
-           locate nginx.pid | xargs cat | xargs kill -USR1
+           # locate nginx.pid | xargs cat | xargs kill -USR1
+           /usr/local/openresty/nginx/sbin/nginx -s reload
        endscript
    }
    ```
