@@ -346,3 +346,21 @@ logs
   docker port 5763ac69b410
 ```
 
+### 互联机制实现便捷互访
+
+容器的互联是一种让多个容器中的应用进行快速交互的方式。它会在源和接受容器之间创建连接关系，接收容器可以通过容器名快速访问到源容器。而不用指定具体的IP地址。
+
+```shell
+# 1. 创建一个带名字的容器
+  docker run -d --name redis redis:6.2.6
+# 2. 创建容器连接到 redis
+  # --link 参数的格式为 --link name:alias , 其中 name 是要链接的容器的名称，alias 是别名
+  docker run -itd --name web --link redis:alias_redis centos:centos8 /bin/bash
+```
+
+## 使用 Dockerfile 创建镜像
+
+Dockerfile 是一个文本格式的配置文件，用户可以使用 Dockerfile 来快速创建自定义的镜像。
+
+Dockerfile 主体内容分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令。
+
