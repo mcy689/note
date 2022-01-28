@@ -360,7 +360,87 @@ logs
 
 ## 使用 Dockerfile 创建镜像
 
-Dockerfile 是一个文本格式的配置文件，用户可以使用 Dockerfile 来快速创建自定义的镜像。
+1. Dockerfile 是一个文本格式的配置文件，用户可以使用 Dockerfile 来快速创建自定义的镜像。
 
-Dockerfile 主体内容分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令。
+2. Dockerfile 主体内容分为四部分：基础镜像信息、维护者信息、镜像操作指令和容器启动时执行指令。
+3. 镜像指的是一组特定的文件层。Docker 中镜像的构建过程，就是 Docker 执行 Dockerfile 中所定义命令形成这组文件层的过程。
 
+<img src="./image/dockerfile.png" alt="dockerfile" style="zoom:50%;" />
+
+### FROM
+
+FROM 指定的基础镜像即可以是本地已经存在的镜像，也可以是远程仓库中的镜像。当 Dockerfile 执行时，如果本地没有其指定的基础镜像，那么就会从远程仓库中下载此镜像。
+
+```dockerfile
+FROM <image>
+FROM <image>:<tag>
+FROM <image>@<digest>
+```
+
+### MAINTAINER
+
+用来维护镜像作者的命令。
+
+```dockerfile
+MAINTAINER authors_name
+```
+
+### RUN
+
+RUN 命令是用来在镜像中执行命令的命令。当使用 `RUN <command>` 用法时，必须在镜像中要有 `/bin/sh`。
+
+```dockerfile
+RUN ["/bin/bash","-c","echo hello"]
+```
+
+RUN 命令执行完毕之后，就会产生一个新的文件层。这个新产生的文件层会被保存在缓存中，并且将作为下一个指令的基础镜像而存在。
+
+### CMD
+
+CMD 是用来设定镜像默认执行的命令的命令。
+
+```dockerfile
+CMD command param1 param2
+```
+
+### LABEL
+
+LABEL 是一个采用键值对的形式来向镜像中添加元数据的命令。
+
+```dockerfile
+LABEL version="1.0"
+LABEL description="This text illustrates"
+```
+
+### EXPOSE
+
+EXPOSE 命令是当容器运行时，来通知 Docker 这个容器中哪写端口是应用程序用来监听的。
+
+```dockerfile
+EXPOSE 8080
+```
+
+### ENV
+
+```dockerfile
+ENV <key> <value>
+ENV <key>=<value>
+```
+
+### ADD
+
+1. 当 src 标记的是本地文件或者目录时，其相对路径应该是相对于 Dockerfile 所在目录的路径，而 dest 则应该指向容器中的目录。
+
+2. 如果这个目录不存在，那么当 ADD 命令执行时，将会在容器中自动创建此目录。
+
+   ```dockerfile
+   ADD <src> <dest>
+   ```
+
+### COPY
+
+```dockerfile
+COPY <src> <dest>
+COPY ["<src>","dest"]
+
+```
