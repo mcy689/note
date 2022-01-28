@@ -1,3 +1,5 @@
+## 手动安装
+
 1. 拉取 centos 最新镜像
 
    ```bash
@@ -101,32 +103,94 @@
    docker run -p 10022:22 -d sshd:centos /run.sh
    ```
 
-9. 登录新启动的容器，本人（宿主）的 IP 地址`172.20.10.3` 。
+9. 登录新启动的容器。
 
    ```bash
-   ssh 172.20.10.3 -p 10022 -l root -i ~/.ssh/docker_root_rsa
+   ssh 127.0.0.1 -p 10022 -l root -i ~/.ssh/docker_root_rsa
    ```
 
 10. 其他
 
-    * 相关 `docker` 命令
+   * 相关 `docker` 命令
 
-      ```html
-      docker images 查看镜像文件
-      docker ps  查看正在运行的容器
-      docker rmi 删除镜像
-      docker rm 删除容器
-      ```
+     ```html
+     docker images 查看镜像文件
+     docker ps  查看正在运行的容器
+     docker rmi 删除镜像
+     docker rm 删除容器
+     ```
 
-    * 报错
+   * 报错
 
-      ```html
-      1. 在步骤8中，容易忘记给启动脚本 `run.sh` 执行权限，导致权限不足。
-      2. 登录以后提示信息
-      		"System is booting up. Unprivileged users are not permitted to log in yet. Please come back later. For technical details, see pam_nologin(8)."
-        
-        需要删除 nologin 文件
-           ls -l /run/nologin
-           rm /run/nologin
-      ```
+     ```html
+     1. 在步骤8中，容易忘记给启动脚本 `run.sh` 执行权限，导致权限不足。
+     2. 登录以后提示信息
+     		"System is booting up. Unprivileged users are not permitted to log in yet. Please come back later. For technical details, see pam_nologin(8)."
+       
+       需要删除 nologin 文件
+          ls -l /run/nologin
+          rm /run/nologin
+     ```
+
+## dockerfile 搭建 ssh
+
+1. 目录结构
+
+   ```html
+   authorized_keys
+   dockerfile
+   id_rsa_ssh
+   id_rsa_ssh.pub
+   ```
+
+2. 创建dockerfile文件
+
+   ```shell
+   touch dockerfile
+   ```
+
+3. 创建密钥文件
+
+   ```shell
+   # 创建密钥文件
+   ssh-keygen -t rsa
+   # 重命名公钥文件
+   cat id_rsa_ssh.pub > authorized_keys
+   ```
+
+4. 编写 dockerfile 文件
+
+   ```dockerfile
+   FROM centos:centos8
+   
+   MAINTAINER "nideshijian@gamil.com"
+   
+   RUN dnf install openssh-server -y \
+       && ssh-keygen -t rsa -b 2048 -f /etc/ssh/ssh_root_rsa_key \
+       && ssh-keygen -t ecdsa -b 256 -f /etc/ssh/ssh_host_ecdsa_key \
+       && ssh-keygen -t ed25519 -b 256 -f /etc/ssh/ssh_host_ed25519_key \
+       && ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key \
+       && sed -ri 's/PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config \
+       && mkdir -p /root/.ssh \
+       && mkdir /var/run/sshd
+   
+   #复制配置文件到相应位置
+   ADD authorized_keys /root/.ssh/authorized_keys
+   
+   # 开放端口
+   EXPOSE 22
+   
+   # 设置自启动命令
+   CMD /usr/sbin/sshd -D
+   ```
+
+5. 使用 build 生成镜像
+
+   ```dockerfile
+   # 生成镜像
+     docker build -t sshd:dockerfile .
+   
+   # 运行镜像
+     docker run -d -p 8880:22 sshd:dockerfile
+   ```
 
