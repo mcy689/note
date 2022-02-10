@@ -135,6 +135,7 @@
 * [反射、其他](Go/反射、其他.md)
 * [map](Go/map.md)
 * [错误处理](Go/错误处理.md)
+* [锁相关的记录](Go/同步.md)
 </details>
 
 <details>
