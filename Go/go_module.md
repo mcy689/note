@@ -180,13 +180,40 @@ require rsc.io/quote v1.5.2
 
 `go mod tidy` 命令来清除这些未使用的依赖。
 
+## 发布 go 模块
+
+### 语义版本
+
+`go.mod` 中的每个必需模块都有一个语义版本，这是用于构建模块的依赖项的最低版本。
+
+语义版本的形式为 `vMAJOR.MINOR.PATCH` 。
+
+1. 对模块的公共 API 进行向后不兼容更改时，请增加 `MAJOR` 版本。
+2. 对 API 进行向后兼容的更改时，请增加 `MINOR` 版本，例如更改依赖关系或添加新的函数，方法，结构字段或类型。
+3. 在进行不影响模块公共 API 或依赖项的细微更改后，增加 `PATCH` 版本，例如修复 bug。
+
+可以通过添加连字符和点分隔的标识符来指定预发行版本 (例如，`v1.0.1-alpha` 或 `v2.2.2-beta.2`)。
+
+`go` 命令优先于普通版本而不是预发行版本，因此用户必须明确要求预发行版本 (例如，`go get example.com/hello@v1.0.1-alpha`)(如果您的模块具有任何的正常版本)。
+
+`v0` 主要版本和预发行版本不保证向后兼容。它们使您可以在对用户做出稳定性承诺之前优化 API。但是，`v1` 主要版本及更高版本要求在该主要版本内向后兼容。
+
+不要从您的仓库中删除版本标签。如果发现某个版本的错误或安全问题，请发布新版本。如果人们依赖于您已删除的版本，则其构建可能会失败。同样，发布版本后，请勿更改或覆盖版本。
+
+### 发布一个模块
+
+1. 项目设置，上面：使用`module` 中的例子。
+2. 创建一个 git 存储库，并添加初始提交。最后将模块推送到远程仓库 `git push origin v0.1.0`
+
+![modules_commit](./image/modules_commit.png)
+
 ## 其他命令
 
-1. 会列出当前模块的所有依赖。
+列出当前模块的所有依赖。
 
-   ```shell
-   go list -m all
-   ```
+```shell
+go list -m all
+```
 
 
 
@@ -196,4 +223,5 @@ require rsc.io/quote v1.5.2
 
 1. [代理配置](https://goproxy.io/zh/docs/getting-started.html)
 2. [模块的介绍](https://learnku.com/docs/go-blog/using-go-modules)
+3. [发布go模块](https://learnku.com/docs/go-blog/publishing-go-modules)
 
