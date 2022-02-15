@@ -128,16 +128,17 @@
 
 * [学习笔记](Go/学习笔记.md)
 * [学习资料](Go/学习资料.md)
-* [nil类型整理](Go/nil.md)
-* [接口相关知识](Go/接口.md)
-* [leetcode](Go/leetcode)
-* [结合信号取消多个协程](Go/结合信号取消多个协程.md)
-* [反射、其他](Go/反射、其他.md)
 * [map](Go/map.md)
-* [错误处理](Go/错误处理.md)
+* [接口相关知识](Go/接口.md)
 * [锁相关的记录](Go/同步.md)
-* [数据结构与算法](Go/数据结构与算法.md)
+* [反射、其他](Go/反射、其他.md)
+* [module使用](Go/go_module.md)
+* [nil类型整理](Go/nil.md)
+* [错误处理](Go/错误处理.md)
+* [结合信号取消多个协程](Go/结合信号取消多个协程.md)
 * [Protocol协议](Go/Protocol协议-go.md)
+* [leetcode](Go/leetcode)
+* [数据结构与算法](Go/数据结构与算法.md)
 </details>
 
 <details>
