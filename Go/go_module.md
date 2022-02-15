@@ -34,10 +34,10 @@ GOPROXY=https://goproxy.io,direct
 
    ```shell
    # mac
-    echo "export GOPROXY=https://goproxy.io,direct" >> ~/.profile && source ~/.profile
+     echo "export GOPROXY=https://goproxy.io,direct" >> ~/.profile && source ~/.profile
    
    # linux
-   	echo "export GOPROXY=https://goproxy.io,direct" >> ~/.bashrc && source ~/.bashrc
+     echo "export GOPROXY=https://goproxy.io,direct" >> ~/.bashrc && source ~/.bashrc
    	
    # 或者直接修改 go 环境变量
      go env -w GO111MODULE=on
