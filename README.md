@@ -135,6 +135,8 @@
 * [module使用](Go/module.md)
 * [nil类型整理](Go/nil.md)
 * [错误处理](Go/错误处理.md)
+* [runtime学习](Go/runtime.md)
+* [热加载简单示例](Go/热加载.md)
 * [结合信号取消多个协程](Go/结合信号取消多个协程.md)
 * [Protocol协议](Go/Protocol协议-go.md)
 * [leetcode](Go/leetcode)
