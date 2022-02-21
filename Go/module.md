@@ -213,6 +213,9 @@ require rsc.io/quote v1.5.2
 
 ```shell
 go list -m all
+
+# 查看依赖的模块是否存在
+go list -m github.com/mcy689/hello@v0.1.0
 ```
 
 
