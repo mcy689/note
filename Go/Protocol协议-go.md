@@ -1,3 +1,9 @@
+## 简介
+
+protobuf 即 Google Protocol Buffer，是一种轻便高效的结构化数据存储格式，与语言、平台无关，可扩展可序列化。protobuf 性能和效率大幅度优于 JSON、XML 等其他的结构化数据格式。protobuf 是以二进制方式存储的，占用空间小，但也带来了可读性差的缺点。
+
+Protobuf 在 `.proto` 定义需要处理的结构化数据，可以通过 `protoc` 工具，将 `.proto` 文件转换为 C、C++、Golang、Java、Python 等多种语言的代码。
+
 ## 说明
 
 [1,2] 表示能取到这个数。表示：`1,2` 。(1,3) 表示不能取到这个数。表示：`2`
@@ -22,9 +28,9 @@ message SearchRequest {
 
 ### 修饰字段规则
 
-1. `required` ，表示是一个必须字段。
+1. `required` ，表示是一个必须字段。**`proto2` 支持修饰符，`proto3` 不支持了** 。
 
-2. `optional`：表示是一个可选字段，
+2. `optional`：表示是一个可选字段。**`proto2` 支持修饰符，`proto3` 不支持了** 。
 
 3. `repeated` 可以重复任意多次（包括0次）。重复的值的顺序会被保留。
 
@@ -51,24 +57,6 @@ message SearchRequest {
    		Scores: []int32{98, 85, 88},
    }
    ```
-
-### 添加更多的消息类型
-
-在一个`.proto` 文件中可以定义多个消息类型，在定义多个相关的消息的时候，这一点特别有用——例如，如果你想定义与你的`SearchResponse` 消息类型相对应的回复消息格式，你可以把它添加到同一个`.proto` 中。
-
-```protobuf
-message SearchRequest {
-  required string query = 1;
-  optional int32 page_number = 2;
-  optional int32 result_per_page = 3;
-}
-
-message SearchResponse {
- ...
-}
-```
-
-虽然在一个`.proto` 文件中可以定义多种消息类型，但如果在一个文件中定义大量具有不同依赖性的消息，也会导致依赖性臃肿。建议在每个.proto文件中包含尽可能少的消息类型。
 
 ### 添加注释
 
@@ -119,39 +107,18 @@ optional int32 result_per_page = 3 [default = 10];
 
 如果没有为`optional`的元素指定默认值，就会使用与特定类型相关的默认值：对`string`来说，默认值是空字符串。对`bool`来说，默认值是false。对数值类型来说，默认值是0。对枚举来说，默认值是枚举类型定义中的第一个值。
 
-## 枚举
+## 使用
 
+### 安装
 
-
-## 使用其他数据类型
-
-可以使用其他消息类型作为字段类型。例如，假设你想在每个SearchResponse消息中包含结果消息--要做到这一点，你可以在同一个.proto中定义一个结果消息类型，然后在SearchResponse中指定一个结果类型的字段。
-
-```protobuf
-message SearchResponse {
-  repeated Result result = 1;
-}
-
-message Result {
-  required string url = 1;
-  optional string title = 2;
-  repeated string snippets = 3;
-}
+```html
+//mac
+  查找    brew search protobuf
+  安装    brew install protobuf
+  检查安装 protoc --version
 ```
 
-
-
-
-
-## 安装
-
-
-
-### protoc
-
-
-
-## go 的依赖包
+### go 的依赖包
 
 ```shell
 go get -u github.com/golang/protobuf/protoc-gen-go
