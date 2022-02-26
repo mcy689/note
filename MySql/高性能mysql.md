@@ -1,6 +1,6 @@
 ## 知识点
 
-1. Datetime 和 timesamp 列都可以存储仙童类型的数据：时间和日期，精确到秒。然而 Timesamp 只使用 datetime 一半的存储空间，并且会根据时区变化，具有特殊的自动更新能力。另一方面，Timestamp 允许的时间范围要小。
+1. Datetime 和 timesamp 列都可以存储时间类型的数据：时间和日期，精确到秒。然而 Timesamp 只使用 datetime 一半的存储空间，并且会根据时区变化，具有特殊的自动更新能力。另一方面，Timestamp 允许的时间范围要小。
 
 ## 架构
 
