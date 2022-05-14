@@ -131,9 +131,3 @@
 * [数据结构与算法](Go/数据结构与算法.md)
 </details>
 
-<details>
-<summary><b>Lua</b></summary>
-
-* [学习笔记](Lua/学习笔记.md)
-</details>
-
