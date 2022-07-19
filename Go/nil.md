@@ -128,7 +128,7 @@ func TestFunc(t *testing.T){
 }
 
 //不能进行赋值操作，否则就会引起 panic
-	var a int = nil //panic
+  var a int = nil //panic
 
 //使用
 type A interface{}
